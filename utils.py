@@ -62,7 +62,7 @@ class TypedDictValue:
         origin = get_origin(typ)
         args = get_args(typ)
         items = args[0]
-        if origin != list or not isinstance(items, Enum):
+        if origin != list or not issubclass(items, Enum):
             raise ValueError("'valueSet' only accept list of Enum")
         return [i.value for i in items]
 
