@@ -94,6 +94,9 @@ class TypedDictValue:
         if origin in {Literal, LiteralString}:
             return args[0]
 
+        if issubclass(typ, Enum):
+            return list(typ)[0].value
+
         if is_typeddict(typ):
             if not self.recursive:
                 return MissingValue(typ)
