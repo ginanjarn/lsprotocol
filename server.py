@@ -1,3 +1,7 @@
+# THIS CODE IS GENERATED FROM 'generator/metaModel.json'.
+# DO NOT EDIT, ALL CHANGES WILL BE REWRITTEN !!!
+
+
 from typing import List, Union
 
 from .lsprotocol import (
@@ -134,7 +138,7 @@ class Server:
 		"""The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders."""
 		self.request(method='workspace/workspaceFolders', params=params)
 
-	def handle_workspace_folders_request(self, context: dict, result: Union[List[WorkspaceFolder], None]) -> None:
+	def handle_workspace_folders_result(self, context: dict, result: Union[List[WorkspaceFolder], None]) -> None:
 		""""""
 
 	def configuration_request(self, params: ConfigurationParams) -> None:
@@ -147,7 +151,7 @@ class Server:
 		change event and empty the cache if such an event is received."""
 		self.request(method='workspace/configuration', params=params)
 
-	def handle_configuration_request(self, context: dict, result: List[LSPAny]) -> None:
+	def handle_configuration_result(self, context: dict, result: List[LSPAny]) -> None:
 		""""""
 
 	def handle_document_color_request(self, context: dict, params: DocumentColorParams) -> List[ColorInformation]:
@@ -164,7 +168,7 @@ class Server:
 		@proposed"""
 		self.request(method='workspace/foldingRange/refresh', params=params)
 
-	def handle_folding_range_refresh_request(self, context: dict, result: None) -> None:
+	def handle_folding_range_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_declaration_request(self, context: dict, params: DeclarationParams) -> Union[Declaration, List[DeclarationLink], None]:
@@ -178,7 +182,7 @@ class Server:
 		reporting from the server."""
 		self.request(method='window/workDoneProgress/create', params=params)
 
-	def handle_work_done_progress_create_request(self, context: dict, result: None) -> None:
+	def handle_work_done_progress_create_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_call_hierarchy_prepare_request(self, context: dict, params: CallHierarchyPrepareParams) -> Union[List[CallHierarchyItem], None]:
@@ -203,7 +207,7 @@ class Server:
 		"""@since 3.16.0"""
 		self.request(method='workspace/semanticTokens/refresh', params=params)
 
-	def handle_semantic_tokens_refresh_request(self, context: dict, result: None) -> None:
+	def handle_semantic_tokens_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def show_document_request(self, params: ShowDocumentParams) -> None:
@@ -215,7 +219,7 @@ class Server:
 		@since 3.16.0"""
 		self.request(method='window/showDocument', params=params)
 
-	def handle_show_document_request(self, context: dict, result: ShowDocumentResult) -> None:
+	def handle_show_document_result(self, context: dict, result: ShowDocumentResult) -> None:
 		""""""
 
 	def handle_linked_editing_range_request(self, context: dict, params: LinkedEditingRangeParams) -> Union[LinkedEditingRanges, None]:
@@ -249,7 +253,7 @@ class Server:
 		"""@since 3.17.0"""
 		self.request(method='workspace/inlineValue/refresh', params=params)
 
-	def handle_inline_value_refresh_request(self, context: dict, result: None) -> None:
+	def handle_inline_value_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_inlay_hint_request(self, context: dict, params: InlayHintParams) -> Union[List[InlayHint], None]:
@@ -262,7 +266,7 @@ class Server:
 		"""@since 3.17.0"""
 		self.request(method='workspace/inlayHint/refresh', params=params)
 
-	def handle_inlay_hint_refresh_request(self, context: dict, result: None) -> None:
+	def handle_inlay_hint_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_document_diagnostic_request(self, context: dict, params: DocumentDiagnosticParams) -> DocumentDiagnosticReport:
@@ -277,7 +281,7 @@ class Server:
 		@since 3.17.0"""
 		self.request(method='workspace/diagnostic/refresh', params=params)
 
-	def handle_diagnostic_refresh_request(self, context: dict, result: None) -> None:
+	def handle_diagnostic_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_inline_completion_request(self, context: dict, params: InlineCompletionParams) -> Union[InlineCompletionList, List[InlineCompletionItem], None]:
@@ -294,7 +298,7 @@ class Server:
 		@proposed"""
 		self.request(method='workspace/textDocumentContent/refresh', params=params)
 
-	def handle_text_document_content_refresh_request(self, context: dict, result: None) -> None:
+	def handle_text_document_content_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def registration_request(self, params: RegistrationParams) -> None:
@@ -302,7 +306,7 @@ class Server:
 		handler on the client side."""
 		self.request(method='client/registerCapability', params=params)
 
-	def handle_registration_request(self, context: dict, result: None) -> None:
+	def handle_registration_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def unregistration_request(self, params: UnregistrationParams) -> None:
@@ -310,7 +314,7 @@ class Server:
 		handler on the client side."""
 		self.request(method='client/unregisterCapability', params=params)
 
-	def handle_unregistration_request(self, context: dict, result: None) -> None:
+	def handle_unregistration_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_initialize_request(self, context: dict, params: InitializeParams) -> InitializeResult:
@@ -324,7 +328,7 @@ class Server:
 		and a set of options actions to the user."""
 		self.request(method='window/showMessageRequest', params=params)
 
-	def handle_show_message_request(self, context: dict, result: Union[MessageActionItem, None]) -> None:
+	def handle_show_message_result(self, context: dict, result: Union[MessageActionItem, None]) -> None:
 		""""""
 
 	def handle_will_save_text_document_wait_until_request(self, context: dict, params: WillSaveTextDocumentParams) -> Union[List[TextEdit], None]:
@@ -378,7 +382,7 @@ class Server:
 		@since 3.16.0"""
 		self.request(method='workspace/codeLens/refresh', params=params)
 
-	def handle_code_lens_refresh_request(self, context: dict, result: None) -> None:
+	def handle_code_lens_refresh_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_document_link_request(self, context: dict, params: DocumentLinkParams) -> Union[List[DocumentLink], None]:
@@ -412,7 +416,7 @@ class Server:
 		"""A request sent from the server to the client to modified certain resources."""
 		self.request(method='workspace/applyEdit', params=params)
 
-	def handle_apply_workspace_edit_request(self, context: dict, result: ApplyWorkspaceEditResult) -> None:
+	def handle_apply_workspace_edit_result(self, context: dict, result: ApplyWorkspaceEditResult) -> None:
 		""""""
 
 	def handle_did_change_workspace_folders_notification(self, context: dict, params: DidChangeWorkspaceFoldersParams) -> None:
@@ -507,27 +511,33 @@ class Server:
 	def progress_notification(self, params: ProgressParams) -> None:
 		self.notify(method='$/progress', params=params)
 
+	def request(self, method: str, params: LSPAny) -> None:
+		raise NotImplementedError("request")
+
+	def notify(self, method: str, params: LSPAny) -> None:
+		raise NotImplementedError("notify")
+
 	def handle(self, method: str, params_or_result: LSPAny) -> None:
 		handle_map = {
 			'textDocument/implementation': self.handle_implementation_request,
 			'textDocument/typeDefinition': self.handle_type_definition_request,
-			'workspace/workspaceFolders': self.handle_workspace_folders_request,
-			'workspace/configuration': self.handle_configuration_request,
+			'workspace/workspaceFolders': self.handle_workspace_folders_result,
+			'workspace/configuration': self.handle_configuration_result,
 			'textDocument/documentColor': self.handle_document_color_request,
 			'textDocument/colorPresentation': self.handle_color_presentation_request,
 			'textDocument/foldingRange': self.handle_folding_range_request,
-			'workspace/foldingRange/refresh': self.handle_folding_range_refresh_request,
+			'workspace/foldingRange/refresh': self.handle_folding_range_refresh_result,
 			'textDocument/declaration': self.handle_declaration_request,
 			'textDocument/selectionRange': self.handle_selection_range_request,
-			'window/workDoneProgress/create': self.handle_work_done_progress_create_request,
+			'window/workDoneProgress/create': self.handle_work_done_progress_create_result,
 			'textDocument/prepareCallHierarchy': self.handle_call_hierarchy_prepare_request,
 			'callHierarchy/incomingCalls': self.handle_call_hierarchy_incoming_calls_request,
 			'callHierarchy/outgoingCalls': self.handle_call_hierarchy_outgoing_calls_request,
 			'textDocument/semanticTokens/full': self.handle_semantic_tokens_request,
 			'textDocument/semanticTokens/full/delta': self.handle_semantic_tokens_delta_request,
 			'textDocument/semanticTokens/range': self.handle_semantic_tokens_range_request,
-			'workspace/semanticTokens/refresh': self.handle_semantic_tokens_refresh_request,
-			'window/showDocument': self.handle_show_document_request,
+			'workspace/semanticTokens/refresh': self.handle_semantic_tokens_refresh_result,
+			'window/showDocument': self.handle_show_document_result,
 			'textDocument/linkedEditingRange': self.handle_linked_editing_range_request,
 			'workspace/willCreateFiles': self.handle_will_create_files_request,
 			'workspace/willRenameFiles': self.handle_will_rename_files_request,
@@ -537,21 +547,21 @@ class Server:
 			'typeHierarchy/supertypes': self.handle_type_hierarchy_supertypes_request,
 			'typeHierarchy/subtypes': self.handle_type_hierarchy_subtypes_request,
 			'textDocument/inlineValue': self.handle_inline_value_request,
-			'workspace/inlineValue/refresh': self.handle_inline_value_refresh_request,
+			'workspace/inlineValue/refresh': self.handle_inline_value_refresh_result,
 			'textDocument/inlayHint': self.handle_inlay_hint_request,
 			'inlayHint/resolve': self.handle_inlay_hint_resolve_request,
-			'workspace/inlayHint/refresh': self.handle_inlay_hint_refresh_request,
+			'workspace/inlayHint/refresh': self.handle_inlay_hint_refresh_result,
 			'textDocument/diagnostic': self.handle_document_diagnostic_request,
 			'workspace/diagnostic': self.handle_workspace_diagnostic_request,
-			'workspace/diagnostic/refresh': self.handle_diagnostic_refresh_request,
+			'workspace/diagnostic/refresh': self.handle_diagnostic_refresh_result,
 			'textDocument/inlineCompletion': self.handle_inline_completion_request,
 			'workspace/textDocumentContent': self.handle_text_document_content_request,
-			'workspace/textDocumentContent/refresh': self.handle_text_document_content_refresh_request,
-			'client/registerCapability': self.handle_registration_request,
-			'client/unregisterCapability': self.handle_unregistration_request,
+			'workspace/textDocumentContent/refresh': self.handle_text_document_content_refresh_result,
+			'client/registerCapability': self.handle_registration_result,
+			'client/unregisterCapability': self.handle_unregistration_result,
 			'initialize': self.handle_initialize_request,
 			'shutdown': self.handle_shutdown_request,
-			'window/showMessageRequest': self.handle_show_message_request,
+			'window/showMessageRequest': self.handle_show_message_result,
 			'textDocument/willSaveWaitUntil': self.handle_will_save_text_document_wait_until_request,
 			'textDocument/completion': self.handle_completion_request,
 			'completionItem/resolve': self.handle_completion_resolve_request,
@@ -567,7 +577,7 @@ class Server:
 			'workspaceSymbol/resolve': self.handle_workspace_symbol_resolve_request,
 			'textDocument/codeLens': self.handle_code_lens_request,
 			'codeLens/resolve': self.handle_code_lens_resolve_request,
-			'workspace/codeLens/refresh': self.handle_code_lens_refresh_request,
+			'workspace/codeLens/refresh': self.handle_code_lens_refresh_result,
 			'textDocument/documentLink': self.handle_document_link_request,
 			'documentLink/resolve': self.handle_document_link_resolve_request,
 			'textDocument/formatting': self.handle_document_formatting_request,
@@ -577,7 +587,7 @@ class Server:
 			'textDocument/rename': self.handle_rename_request,
 			'textDocument/prepareRename': self.handle_prepare_rename_request,
 			'workspace/executeCommand': self.handle_execute_command_request,
-			'workspace/applyEdit': self.handle_apply_workspace_edit_request,
+			'workspace/applyEdit': self.handle_apply_workspace_edit_result,
 			'workspace/didChangeWorkspaceFolders': self.handle_did_change_workspace_folders_notification,
 			'window/workDoneProgress/cancel': self.handle_work_done_progress_cancel_notification,
 			'workspace/didCreateFiles': self.handle_did_create_files_notification,

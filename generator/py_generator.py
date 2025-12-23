@@ -203,6 +203,12 @@ class Class:
         return "".join(code)
 
 
+AUTOGENERATE_WARNING = (
+    "# THIS CODE IS GENERATED FROM 'generator/metaModel.json'.\n"
+    "# DO NOT EDIT, ALL CHANGES WILL BE REWRITTEN !!!\n"
+)
+
+
 class CodeGenerator:
     def __init__(self, model: MetaModel) -> None:
         self.model = model
@@ -276,7 +282,7 @@ class CodeGenerator:
         types = imports + ordered_types
 
         types_code = [t.get_code() for t in types]
-        return "\n\n".join(types_code)
+        return "\n\n".join([AUTOGENERATE_WARNING] + types_code)
 
     @property
     def server_code(self) -> str:
@@ -290,18 +296,41 @@ class CodeGenerator:
             f"handle_map = {{\n\t{handle_map}\n\t}}\n"
             "return handle_map[method](params_or_result)\n"
         )
-        self._server.methods.append(
-            Function(
-                "handle",
-                arguments=[
-                    Argument("self"),
-                    Argument("method", "str"),
-                    Argument("params_or_result", "LSPAny"),
-                ],
-                annotation="None",
-                body=body,
-            ),
+        self._server.methods.extend(
+            [
+                Function(
+                    "request",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body='raise NotImplementedError("request")',
+                ),
+                Function(
+                    "notify",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body='raise NotImplementedError("notify")',
+                ),
+                Function(
+                    "handle",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params_or_result", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body=body,
+                ),
+            ]
         )
+
         protocol_imports = ImportsManager([self._server], self._types).resolve()
         imports = [
             FromImports("typing", ["List", "Union"]),
@@ -309,7 +338,9 @@ class CodeGenerator:
         ]
         server_types = imports + [self._server]
 
-        return "\n\n".join([c.get_code() for c in server_types])
+        return "\n\n".join(
+            [AUTOGENERATE_WARNING] + [c.get_code() for c in server_types]
+        )
 
     @property
     def client_code(self) -> str:
@@ -323,17 +354,40 @@ class CodeGenerator:
             f"handle_map = {{\n\t{handle_map}\n\t}}\n"
             "return handle_map[method](params_or_result)\n"
         )
-        self._client.methods.append(
-            Function(
-                "handle",
-                arguments=[
-                    Argument("self"),
-                    Argument("method", "str"),
-                    Argument("params_or_result", "LSPAny"),
-                ],
-                annotation="None",
-                body=body,
-            ),
+
+        self._client.methods.extend(
+            [
+                Function(
+                    "request",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body='raise NotImplementedError("request")',
+                ),
+                Function(
+                    "notify",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body='raise NotImplementedError("notify")',
+                ),
+                Function(
+                    "handle",
+                    arguments=[
+                        Argument("self"),
+                        Argument("method", "str"),
+                        Argument("params_or_result", "LSPAny"),
+                    ],
+                    annotation="None",
+                    body=body,
+                ),
+            ]
         )
 
         protocol_imports = ImportsManager([self._client], self._types).resolve()
@@ -341,7 +395,9 @@ class CodeGenerator:
             FromImports("typing", ["List", "Union"]),
             FromImports(".lsprotocol", protocol_imports),
         ]
-        client_code = "\n\n".join([c.get_code() for c in imports + [self._client]])
+        client_code = "\n\n".join(
+            [AUTOGENERATE_WARNING] + [c.get_code() for c in imports + [self._client]]
+        )
         return client_code
 
     def type_(self, tp: Type) -> str:
@@ -428,7 +484,8 @@ class CodeGenerator:
 
     def request(self, tp: Request) -> None:
         func_name = to_snake_case(tp.typeName)
-        handle_func_name = "handle_" + func_name
+        handle_result_func_name = "handle_" + func_name.replace("request", "result")
+        handle_request_func_name = "handle_" + func_name
         request_function = Function(
             func_name,
             arguments=[
@@ -440,7 +497,7 @@ class CodeGenerator:
             docstring=tp.documentation,
         )
         handle_result_function = Function(
-            handle_func_name,
+            handle_result_func_name,
             arguments=[
                 Argument("self"),
                 Argument("context", "dict"),
@@ -449,7 +506,7 @@ class CodeGenerator:
             annotation="None",
         )
         handle_request_function = Function(
-            handle_func_name,
+            handle_request_func_name,
             arguments=[
                 Argument("self"),
                 Argument("context", "dict"),
@@ -463,10 +520,10 @@ class CodeGenerator:
         }:
             self._client.methods.append(request_function)
             self._client.methods.append(handle_result_function)
-            self._client_handle_map[tp.method] = handle_func_name
+            self._client_handle_map[tp.method] = handle_result_func_name
 
             self._server.methods.append(handle_request_function)
-            self._server_handle_map[tp.method] = handle_func_name
+            self._server_handle_map[tp.method] = handle_request_func_name
 
         if tp.messageDirection in {
             MessageDirection.SERVERTOCLIENT,
@@ -474,10 +531,10 @@ class CodeGenerator:
         }:
             self._server.methods.append(request_function)
             self._server.methods.append(handle_result_function)
-            self._server_handle_map[tp.method] = handle_func_name
+            self._server_handle_map[tp.method] = handle_result_func_name
 
             self._client.methods.append(handle_request_function)
-            self._client_handle_map[tp.method] = handle_func_name
+            self._client_handle_map[tp.method] = handle_request_func_name
 
     def notification(self, tp: Notification) -> None:
         func_name = to_snake_case(tp.typeName)

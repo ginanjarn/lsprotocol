@@ -1,3 +1,7 @@
+# THIS CODE IS GENERATED FROM 'generator/metaModel.json'.
+# DO NOT EDIT, ALL CHANGES WILL BE REWRITTEN !!!
+
+
 from __future__ import annotations
 
 from enum import Enum

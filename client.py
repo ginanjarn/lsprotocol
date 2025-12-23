@@ -1,3 +1,7 @@
+# THIS CODE IS GENERATED FROM 'generator/metaModel.json'.
+# DO NOT EDIT, ALL CHANGES WILL BE REWRITTEN !!!
+
+
 from typing import List, Union
 
 from .lsprotocol import (
@@ -130,7 +134,7 @@ class Client:
 		the response is of type {@link Definition} or a Thenable that resolves to such."""
 		self.request(method='textDocument/implementation', params=params)
 
-	def handle_implementation_request(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
+	def handle_implementation_result(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
 		""""""
 
 	def type_definition_request(self, params: TypeDefinitionParams) -> None:
@@ -139,7 +143,7 @@ class Client:
 		the response is of type {@link Definition} or a Thenable that resolves to such."""
 		self.request(method='textDocument/typeDefinition', params=params)
 
-	def handle_type_definition_request(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
+	def handle_type_definition_result(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
 		""""""
 
 	def handle_workspace_folders_request(self, context: dict, params: None) -> Union[List[WorkspaceFolder], None]:
@@ -155,7 +159,7 @@ class Client:
 		that resolves to such."""
 		self.request(method='textDocument/documentColor', params=params)
 
-	def handle_document_color_request(self, context: dict, result: List[ColorInformation]) -> None:
+	def handle_document_color_result(self, context: dict, result: List[ColorInformation]) -> None:
 		""""""
 
 	def color_presentation_request(self, params: ColorPresentationParams) -> None:
@@ -165,7 +169,7 @@ class Client:
 		that resolves to such."""
 		self.request(method='textDocument/colorPresentation', params=params)
 
-	def handle_color_presentation_request(self, context: dict, result: List[ColorPresentation]) -> None:
+	def handle_color_presentation_result(self, context: dict, result: List[ColorPresentation]) -> None:
 		""""""
 
 	def folding_range_request(self, params: FoldingRangeParams) -> None:
@@ -175,7 +179,7 @@ class Client:
 		that resolves to such."""
 		self.request(method='textDocument/foldingRange', params=params)
 
-	def handle_folding_range_request(self, context: dict, result: Union[List[FoldingRange], None]) -> None:
+	def handle_folding_range_result(self, context: dict, result: Union[List[FoldingRange], None]) -> None:
 		""""""
 
 	def handle_folding_range_refresh_request(self, context: dict, params: None) -> None:
@@ -188,7 +192,7 @@ class Client:
 		or a Thenable that resolves to such."""
 		self.request(method='textDocument/declaration', params=params)
 
-	def handle_declaration_request(self, context: dict, result: Union[Declaration, List[DeclarationLink], None]) -> None:
+	def handle_declaration_result(self, context: dict, result: Union[Declaration, List[DeclarationLink], None]) -> None:
 		""""""
 
 	def selection_range_request(self, params: SelectionRangeParams) -> None:
@@ -198,7 +202,7 @@ class Client:
 		that resolves to such."""
 		self.request(method='textDocument/selectionRange', params=params)
 
-	def handle_selection_range_request(self, context: dict, result: Union[List[SelectionRange], None]) -> None:
+	def handle_selection_range_result(self, context: dict, result: Union[List[SelectionRange], None]) -> None:
 		""""""
 
 	def handle_work_done_progress_create_request(self, context: dict, params: WorkDoneProgressCreateParams) -> None:
@@ -211,7 +215,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='textDocument/prepareCallHierarchy', params=params)
 
-	def handle_call_hierarchy_prepare_request(self, context: dict, result: Union[List[CallHierarchyItem], None]) -> None:
+	def handle_call_hierarchy_prepare_result(self, context: dict, result: Union[List[CallHierarchyItem], None]) -> None:
 		""""""
 
 	def call_hierarchy_incoming_calls_request(self, params: CallHierarchyIncomingCallsParams) -> None:
@@ -220,7 +224,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='callHierarchy/incomingCalls', params=params)
 
-	def handle_call_hierarchy_incoming_calls_request(self, context: dict, result: Union[List[CallHierarchyIncomingCall], None]) -> None:
+	def handle_call_hierarchy_incoming_calls_result(self, context: dict, result: Union[List[CallHierarchyIncomingCall], None]) -> None:
 		""""""
 
 	def call_hierarchy_outgoing_calls_request(self, params: CallHierarchyOutgoingCallsParams) -> None:
@@ -229,28 +233,28 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='callHierarchy/outgoingCalls', params=params)
 
-	def handle_call_hierarchy_outgoing_calls_request(self, context: dict, result: Union[List[CallHierarchyOutgoingCall], None]) -> None:
+	def handle_call_hierarchy_outgoing_calls_result(self, context: dict, result: Union[List[CallHierarchyOutgoingCall], None]) -> None:
 		""""""
 
 	def semantic_tokens_request(self, params: SemanticTokensParams) -> None:
 		"""@since 3.16.0"""
 		self.request(method='textDocument/semanticTokens/full', params=params)
 
-	def handle_semantic_tokens_request(self, context: dict, result: Union[SemanticTokens, None]) -> None:
+	def handle_semantic_tokens_result(self, context: dict, result: Union[SemanticTokens, None]) -> None:
 		""""""
 
 	def semantic_tokens_delta_request(self, params: SemanticTokensDeltaParams) -> None:
 		"""@since 3.16.0"""
 		self.request(method='textDocument/semanticTokens/full/delta', params=params)
 
-	def handle_semantic_tokens_delta_request(self, context: dict, result: Union[SemanticTokens, SemanticTokensDelta, None]) -> None:
+	def handle_semantic_tokens_delta_result(self, context: dict, result: Union[SemanticTokens, SemanticTokensDelta, None]) -> None:
 		""""""
 
 	def semantic_tokens_range_request(self, params: SemanticTokensRangeParams) -> None:
 		"""@since 3.16.0"""
 		self.request(method='textDocument/semanticTokens/range', params=params)
 
-	def handle_semantic_tokens_range_request(self, context: dict, result: Union[SemanticTokens, None]) -> None:
+	def handle_semantic_tokens_range_result(self, context: dict, result: Union[SemanticTokens, None]) -> None:
 		""""""
 
 	def handle_semantic_tokens_refresh_request(self, context: dict, params: None) -> None:
@@ -265,7 +269,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='textDocument/linkedEditingRange', params=params)
 
-	def handle_linked_editing_range_request(self, context: dict, result: Union[LinkedEditingRanges, None]) -> None:
+	def handle_linked_editing_range_result(self, context: dict, result: Union[LinkedEditingRanges, None]) -> None:
 		""""""
 
 	def will_create_files_request(self, params: CreateFilesParams) -> None:
@@ -279,7 +283,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='workspace/willCreateFiles', params=params)
 
-	def handle_will_create_files_request(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
+	def handle_will_create_files_result(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
 		""""""
 
 	def will_rename_files_request(self, params: RenameFilesParams) -> None:
@@ -289,7 +293,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='workspace/willRenameFiles', params=params)
 
-	def handle_will_rename_files_request(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
+	def handle_will_rename_files_result(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
 		""""""
 
 	def will_delete_files_request(self, params: DeleteFilesParams) -> None:
@@ -299,7 +303,7 @@ class Client:
 		@since 3.16.0"""
 		self.request(method='workspace/willDeleteFiles', params=params)
 
-	def handle_will_delete_files_request(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
+	def handle_will_delete_files_result(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
 		""""""
 
 	def moniker_request(self, params: MonikerParams) -> None:
@@ -308,7 +312,7 @@ class Client:
 		The response is of type {@link Moniker Moniker[]} or `null`."""
 		self.request(method='textDocument/moniker', params=params)
 
-	def handle_moniker_request(self, context: dict, result: Union[List[Moniker], None]) -> None:
+	def handle_moniker_result(self, context: dict, result: Union[List[Moniker], None]) -> None:
 		""""""
 
 	def type_hierarchy_prepare_request(self, params: TypeHierarchyPrepareParams) -> None:
@@ -318,7 +322,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='textDocument/prepareTypeHierarchy', params=params)
 
-	def handle_type_hierarchy_prepare_request(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
+	def handle_type_hierarchy_prepare_result(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
 		""""""
 
 	def type_hierarchy_supertypes_request(self, params: TypeHierarchySupertypesParams) -> None:
@@ -327,7 +331,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='typeHierarchy/supertypes', params=params)
 
-	def handle_type_hierarchy_supertypes_request(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
+	def handle_type_hierarchy_supertypes_result(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
 		""""""
 
 	def type_hierarchy_subtypes_request(self, params: TypeHierarchySubtypesParams) -> None:
@@ -336,7 +340,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='typeHierarchy/subtypes', params=params)
 
-	def handle_type_hierarchy_subtypes_request(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
+	def handle_type_hierarchy_subtypes_result(self, context: dict, result: Union[List[TypeHierarchyItem], None]) -> None:
 		""""""
 
 	def inline_value_request(self, params: InlineValueParams) -> None:
@@ -347,7 +351,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='textDocument/inlineValue', params=params)
 
-	def handle_inline_value_request(self, context: dict, result: Union[List[InlineValue], None]) -> None:
+	def handle_inline_value_result(self, context: dict, result: Union[List[InlineValue], None]) -> None:
 		""""""
 
 	def handle_inline_value_refresh_request(self, context: dict, params: None) -> None:
@@ -361,7 +365,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='textDocument/inlayHint', params=params)
 
-	def handle_inlay_hint_request(self, context: dict, result: Union[List[InlayHint], None]) -> None:
+	def handle_inlay_hint_result(self, context: dict, result: Union[List[InlayHint], None]) -> None:
 		""""""
 
 	def inlay_hint_resolve_request(self, params: InlayHint) -> None:
@@ -372,7 +376,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='inlayHint/resolve', params=params)
 
-	def handle_inlay_hint_resolve_request(self, context: dict, result: InlayHint) -> None:
+	def handle_inlay_hint_resolve_result(self, context: dict, result: InlayHint) -> None:
 		""""""
 
 	def handle_inlay_hint_refresh_request(self, context: dict, params: None) -> None:
@@ -384,7 +388,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='textDocument/diagnostic', params=params)
 
-	def handle_document_diagnostic_request(self, context: dict, result: DocumentDiagnosticReport) -> None:
+	def handle_document_diagnostic_result(self, context: dict, result: DocumentDiagnosticReport) -> None:
 		""""""
 
 	def workspace_diagnostic_request(self, params: WorkspaceDiagnosticParams) -> None:
@@ -393,7 +397,7 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='workspace/diagnostic', params=params)
 
-	def handle_workspace_diagnostic_request(self, context: dict, result: WorkspaceDiagnosticReport) -> None:
+	def handle_workspace_diagnostic_result(self, context: dict, result: WorkspaceDiagnosticReport) -> None:
 		""""""
 
 	def handle_diagnostic_refresh_request(self, context: dict, params: None) -> None:
@@ -408,7 +412,7 @@ class Client:
 		@proposed"""
 		self.request(method='textDocument/inlineCompletion', params=params)
 
-	def handle_inline_completion_request(self, context: dict, result: Union[InlineCompletionList, List[InlineCompletionItem], None]) -> None:
+	def handle_inline_completion_result(self, context: dict, result: Union[InlineCompletionList, List[InlineCompletionItem], None]) -> None:
 		""""""
 
 	def text_document_content_request(self, params: TextDocumentContentParams) -> None:
@@ -419,7 +423,7 @@ class Client:
 		@proposed"""
 		self.request(method='workspace/textDocumentContent', params=params)
 
-	def handle_text_document_content_request(self, context: dict, result: TextDocumentContentResult) -> None:
+	def handle_text_document_content_result(self, context: dict, result: TextDocumentContentResult) -> None:
 		""""""
 
 	def handle_text_document_content_refresh_request(self, context: dict, params: TextDocumentContentRefreshParams) -> None:
@@ -439,7 +443,7 @@ class Client:
 		resolves to such."""
 		self.request(method='initialize', params=params)
 
-	def handle_initialize_request(self, context: dict, result: InitializeResult) -> None:
+	def handle_initialize_result(self, context: dict, result: InitializeResult) -> None:
 		""""""
 
 	def shutdown_request(self, params: None) -> None:
@@ -449,7 +453,7 @@ class Client:
 		is the exit event."""
 		self.request(method='shutdown', params=params)
 
-	def handle_shutdown_request(self, context: dict, result: None) -> None:
+	def handle_shutdown_result(self, context: dict, result: None) -> None:
 		""""""
 
 	def handle_show_message_request(self, context: dict, params: ShowMessageRequestParams) -> Union[MessageActionItem, None]:
@@ -464,7 +468,7 @@ class Client:
 		reliable."""
 		self.request(method='textDocument/willSaveWaitUntil', params=params)
 
-	def handle_will_save_text_document_wait_until_request(self, context: dict, result: Union[List[TextEdit], None]) -> None:
+	def handle_will_save_text_document_wait_until_result(self, context: dict, result: Union[List[TextEdit], None]) -> None:
 		""""""
 
 	def completion_request(self, params: CompletionParams) -> None:
@@ -479,7 +483,7 @@ class Client:
 		`filterText`, `insertText`, and `textEdit`, must not be changed during resolve."""
 		self.request(method='textDocument/completion', params=params)
 
-	def handle_completion_request(self, context: dict, result: Union[List[CompletionItem], CompletionList, None]) -> None:
+	def handle_completion_result(self, context: dict, result: Union[List[CompletionItem], CompletionList, None]) -> None:
 		""""""
 
 	def completion_resolve_request(self, params: CompletionItem) -> None:
@@ -488,7 +492,7 @@ class Client:
 		is of type {@link CompletionItem} or a Thenable that resolves to such."""
 		self.request(method='completionItem/resolve', params=params)
 
-	def handle_completion_resolve_request(self, context: dict, result: CompletionItem) -> None:
+	def handle_completion_resolve_result(self, context: dict, result: CompletionItem) -> None:
 		""""""
 
 	def hover_request(self, params: HoverParams) -> None:
@@ -497,13 +501,13 @@ class Client:
 		type {@link Hover} or a Thenable that resolves to such."""
 		self.request(method='textDocument/hover', params=params)
 
-	def handle_hover_request(self, context: dict, result: Union[Hover, None]) -> None:
+	def handle_hover_result(self, context: dict, result: Union[Hover, None]) -> None:
 		""""""
 
 	def signature_help_request(self, params: SignatureHelpParams) -> None:
 		self.request(method='textDocument/signatureHelp', params=params)
 
-	def handle_signature_help_request(self, context: dict, result: Union[SignatureHelp, None]) -> None:
+	def handle_signature_help_result(self, context: dict, result: Union[SignatureHelp, None]) -> None:
 		""""""
 
 	def definition_request(self, params: DefinitionParams) -> None:
@@ -513,7 +517,7 @@ class Client:
 		{@link DefinitionLink} or a Thenable that resolves to such."""
 		self.request(method='textDocument/definition', params=params)
 
-	def handle_definition_request(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
+	def handle_definition_result(self, context: dict, result: Union[Definition, List[DefinitionLink], None]) -> None:
 		""""""
 
 	def references_request(self, params: ReferenceParams) -> None:
@@ -523,7 +527,7 @@ class Client:
 		{@link Location Location[]} or a Thenable that resolves to such."""
 		self.request(method='textDocument/references', params=params)
 
-	def handle_references_request(self, context: dict, result: Union[List[Location], None]) -> None:
+	def handle_references_result(self, context: dict, result: Union[List[Location], None]) -> None:
 		""""""
 
 	def document_highlight_request(self, params: DocumentHighlightParams) -> None:
@@ -533,7 +537,7 @@ class Client:
 		or a Thenable that resolves to such."""
 		self.request(method='textDocument/documentHighlight', params=params)
 
-	def handle_document_highlight_request(self, context: dict, result: Union[List[DocumentHighlight], None]) -> None:
+	def handle_document_highlight_result(self, context: dict, result: Union[List[DocumentHighlight], None]) -> None:
 		""""""
 
 	def document_symbol_request(self, params: DocumentSymbolParams) -> None:
@@ -543,14 +547,14 @@ class Client:
 		that resolves to such."""
 		self.request(method='textDocument/documentSymbol', params=params)
 
-	def handle_document_symbol_request(self, context: dict, result: Union[List[SymbolInformation], List[DocumentSymbol], None]) -> None:
+	def handle_document_symbol_result(self, context: dict, result: Union[List[SymbolInformation], List[DocumentSymbol], None]) -> None:
 		""""""
 
 	def code_action_request(self, params: CodeActionParams) -> None:
 		"""A request to provide commands for the given text document and range."""
 		self.request(method='textDocument/codeAction', params=params)
 
-	def handle_code_action_request(self, context: dict, result: Union[List[Union[Command, CodeAction]], None]) -> None:
+	def handle_code_action_result(self, context: dict, result: Union[List[Union[Command, CodeAction]], None]) -> None:
 		""""""
 
 	def code_action_resolve_request(self, params: CodeAction) -> None:
@@ -559,7 +563,7 @@ class Client:
 		is of type {@link CodeAction} or a Thenable that resolves to such."""
 		self.request(method='codeAction/resolve', params=params)
 
-	def handle_code_action_resolve_request(self, context: dict, result: CodeAction) -> None:
+	def handle_code_action_resolve_result(self, context: dict, result: CodeAction) -> None:
 		""""""
 
 	def workspace_symbol_request(self, params: WorkspaceSymbolParams) -> None:
@@ -574,7 +578,7 @@ class Client:
 		"""
 		self.request(method='workspace/symbol', params=params)
 
-	def handle_workspace_symbol_request(self, context: dict, result: Union[List[SymbolInformation], List[WorkspaceSymbol], None]) -> None:
+	def handle_workspace_symbol_result(self, context: dict, result: Union[List[SymbolInformation], List[WorkspaceSymbol], None]) -> None:
 		""""""
 
 	def workspace_symbol_resolve_request(self, params: WorkspaceSymbol) -> None:
@@ -584,21 +588,21 @@ class Client:
 		@since 3.17.0"""
 		self.request(method='workspaceSymbol/resolve', params=params)
 
-	def handle_workspace_symbol_resolve_request(self, context: dict, result: WorkspaceSymbol) -> None:
+	def handle_workspace_symbol_resolve_result(self, context: dict, result: WorkspaceSymbol) -> None:
 		""""""
 
 	def code_lens_request(self, params: CodeLensParams) -> None:
 		"""A request to provide code lens for the given text document."""
 		self.request(method='textDocument/codeLens', params=params)
 
-	def handle_code_lens_request(self, context: dict, result: Union[List[CodeLens], None]) -> None:
+	def handle_code_lens_result(self, context: dict, result: Union[List[CodeLens], None]) -> None:
 		""""""
 
 	def code_lens_resolve_request(self, params: CodeLens) -> None:
 		"""A request to resolve a command for a given code lens."""
 		self.request(method='codeLens/resolve', params=params)
 
-	def handle_code_lens_resolve_request(self, context: dict, result: CodeLens) -> None:
+	def handle_code_lens_resolve_result(self, context: dict, result: CodeLens) -> None:
 		""""""
 
 	def handle_code_lens_refresh_request(self, context: dict, params: None) -> None:
@@ -608,7 +612,7 @@ class Client:
 		"""A request to provide document links"""
 		self.request(method='textDocument/documentLink', params=params)
 
-	def handle_document_link_request(self, context: dict, result: Union[List[DocumentLink], None]) -> None:
+	def handle_document_link_result(self, context: dict, result: Union[List[DocumentLink], None]) -> None:
 		""""""
 
 	def document_link_resolve_request(self, params: DocumentLink) -> None:
@@ -617,21 +621,21 @@ class Client:
 		is of type {@link DocumentLink} or a Thenable that resolves to such."""
 		self.request(method='documentLink/resolve', params=params)
 
-	def handle_document_link_resolve_request(self, context: dict, result: DocumentLink) -> None:
+	def handle_document_link_resolve_result(self, context: dict, result: DocumentLink) -> None:
 		""""""
 
 	def document_formatting_request(self, params: DocumentFormattingParams) -> None:
 		"""A request to format a whole document."""
 		self.request(method='textDocument/formatting', params=params)
 
-	def handle_document_formatting_request(self, context: dict, result: Union[List[TextEdit], None]) -> None:
+	def handle_document_formatting_result(self, context: dict, result: Union[List[TextEdit], None]) -> None:
 		""""""
 
 	def document_range_formatting_request(self, params: DocumentRangeFormattingParams) -> None:
 		"""A request to format a range in a document."""
 		self.request(method='textDocument/rangeFormatting', params=params)
 
-	def handle_document_range_formatting_request(self, context: dict, result: Union[List[TextEdit], None]) -> None:
+	def handle_document_range_formatting_result(self, context: dict, result: Union[List[TextEdit], None]) -> None:
 		""""""
 
 	def document_ranges_formatting_request(self, params: DocumentRangesFormattingParams) -> None:
@@ -641,21 +645,21 @@ class Client:
 		@proposed"""
 		self.request(method='textDocument/rangesFormatting', params=params)
 
-	def handle_document_ranges_formatting_request(self, context: dict, result: Union[List[TextEdit], None]) -> None:
+	def handle_document_ranges_formatting_result(self, context: dict, result: Union[List[TextEdit], None]) -> None:
 		""""""
 
 	def document_on_type_formatting_request(self, params: DocumentOnTypeFormattingParams) -> None:
 		"""A request to format a document on type."""
 		self.request(method='textDocument/onTypeFormatting', params=params)
 
-	def handle_document_on_type_formatting_request(self, context: dict, result: Union[List[TextEdit], None]) -> None:
+	def handle_document_on_type_formatting_result(self, context: dict, result: Union[List[TextEdit], None]) -> None:
 		""""""
 
 	def rename_request(self, params: RenameParams) -> None:
 		"""A request to rename a symbol."""
 		self.request(method='textDocument/rename', params=params)
 
-	def handle_rename_request(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
+	def handle_rename_result(self, context: dict, result: Union[WorkspaceEdit, None]) -> None:
 		""""""
 
 	def prepare_rename_request(self, params: PrepareRenameParams) -> None:
@@ -664,7 +668,7 @@ class Client:
 		@since 3.16 - support for default behavior"""
 		self.request(method='textDocument/prepareRename', params=params)
 
-	def handle_prepare_rename_request(self, context: dict, result: Union[PrepareRenameResult, None]) -> None:
+	def handle_prepare_rename_result(self, context: dict, result: Union[PrepareRenameResult, None]) -> None:
 		""""""
 
 	def execute_command_request(self, params: ExecuteCommandParams) -> None:
@@ -672,7 +676,7 @@ class Client:
 		a workspace edit which the client will apply to the workspace."""
 		self.request(method='workspace/executeCommand', params=params)
 
-	def handle_execute_command_request(self, context: dict, result: Union[LSPAny, None]) -> None:
+	def handle_execute_command_result(self, context: dict, result: Union[LSPAny, None]) -> None:
 		""""""
 
 	def handle_apply_workspace_edit_request(self, context: dict, params: ApplyWorkspaceEditParams) -> ApplyWorkspaceEditResult:
@@ -818,76 +822,82 @@ class Client:
 	def handle_progress_notification(self, context: dict, params: ProgressParams) -> None:
 		""""""
 
+	def request(self, method: str, params: LSPAny) -> None:
+		raise NotImplementedError("request")
+
+	def notify(self, method: str, params: LSPAny) -> None:
+		raise NotImplementedError("notify")
+
 	def handle(self, method: str, params_or_result: LSPAny) -> None:
 		handle_map = {
-			'textDocument/implementation': self.handle_implementation_request,
-			'textDocument/typeDefinition': self.handle_type_definition_request,
+			'textDocument/implementation': self.handle_implementation_result,
+			'textDocument/typeDefinition': self.handle_type_definition_result,
 			'workspace/workspaceFolders': self.handle_workspace_folders_request,
 			'workspace/configuration': self.handle_configuration_request,
-			'textDocument/documentColor': self.handle_document_color_request,
-			'textDocument/colorPresentation': self.handle_color_presentation_request,
-			'textDocument/foldingRange': self.handle_folding_range_request,
+			'textDocument/documentColor': self.handle_document_color_result,
+			'textDocument/colorPresentation': self.handle_color_presentation_result,
+			'textDocument/foldingRange': self.handle_folding_range_result,
 			'workspace/foldingRange/refresh': self.handle_folding_range_refresh_request,
-			'textDocument/declaration': self.handle_declaration_request,
-			'textDocument/selectionRange': self.handle_selection_range_request,
+			'textDocument/declaration': self.handle_declaration_result,
+			'textDocument/selectionRange': self.handle_selection_range_result,
 			'window/workDoneProgress/create': self.handle_work_done_progress_create_request,
-			'textDocument/prepareCallHierarchy': self.handle_call_hierarchy_prepare_request,
-			'callHierarchy/incomingCalls': self.handle_call_hierarchy_incoming_calls_request,
-			'callHierarchy/outgoingCalls': self.handle_call_hierarchy_outgoing_calls_request,
-			'textDocument/semanticTokens/full': self.handle_semantic_tokens_request,
-			'textDocument/semanticTokens/full/delta': self.handle_semantic_tokens_delta_request,
-			'textDocument/semanticTokens/range': self.handle_semantic_tokens_range_request,
+			'textDocument/prepareCallHierarchy': self.handle_call_hierarchy_prepare_result,
+			'callHierarchy/incomingCalls': self.handle_call_hierarchy_incoming_calls_result,
+			'callHierarchy/outgoingCalls': self.handle_call_hierarchy_outgoing_calls_result,
+			'textDocument/semanticTokens/full': self.handle_semantic_tokens_result,
+			'textDocument/semanticTokens/full/delta': self.handle_semantic_tokens_delta_result,
+			'textDocument/semanticTokens/range': self.handle_semantic_tokens_range_result,
 			'workspace/semanticTokens/refresh': self.handle_semantic_tokens_refresh_request,
 			'window/showDocument': self.handle_show_document_request,
-			'textDocument/linkedEditingRange': self.handle_linked_editing_range_request,
-			'workspace/willCreateFiles': self.handle_will_create_files_request,
-			'workspace/willRenameFiles': self.handle_will_rename_files_request,
-			'workspace/willDeleteFiles': self.handle_will_delete_files_request,
-			'textDocument/moniker': self.handle_moniker_request,
-			'textDocument/prepareTypeHierarchy': self.handle_type_hierarchy_prepare_request,
-			'typeHierarchy/supertypes': self.handle_type_hierarchy_supertypes_request,
-			'typeHierarchy/subtypes': self.handle_type_hierarchy_subtypes_request,
-			'textDocument/inlineValue': self.handle_inline_value_request,
+			'textDocument/linkedEditingRange': self.handle_linked_editing_range_result,
+			'workspace/willCreateFiles': self.handle_will_create_files_result,
+			'workspace/willRenameFiles': self.handle_will_rename_files_result,
+			'workspace/willDeleteFiles': self.handle_will_delete_files_result,
+			'textDocument/moniker': self.handle_moniker_result,
+			'textDocument/prepareTypeHierarchy': self.handle_type_hierarchy_prepare_result,
+			'typeHierarchy/supertypes': self.handle_type_hierarchy_supertypes_result,
+			'typeHierarchy/subtypes': self.handle_type_hierarchy_subtypes_result,
+			'textDocument/inlineValue': self.handle_inline_value_result,
 			'workspace/inlineValue/refresh': self.handle_inline_value_refresh_request,
-			'textDocument/inlayHint': self.handle_inlay_hint_request,
-			'inlayHint/resolve': self.handle_inlay_hint_resolve_request,
+			'textDocument/inlayHint': self.handle_inlay_hint_result,
+			'inlayHint/resolve': self.handle_inlay_hint_resolve_result,
 			'workspace/inlayHint/refresh': self.handle_inlay_hint_refresh_request,
-			'textDocument/diagnostic': self.handle_document_diagnostic_request,
-			'workspace/diagnostic': self.handle_workspace_diagnostic_request,
+			'textDocument/diagnostic': self.handle_document_diagnostic_result,
+			'workspace/diagnostic': self.handle_workspace_diagnostic_result,
 			'workspace/diagnostic/refresh': self.handle_diagnostic_refresh_request,
-			'textDocument/inlineCompletion': self.handle_inline_completion_request,
-			'workspace/textDocumentContent': self.handle_text_document_content_request,
+			'textDocument/inlineCompletion': self.handle_inline_completion_result,
+			'workspace/textDocumentContent': self.handle_text_document_content_result,
 			'workspace/textDocumentContent/refresh': self.handle_text_document_content_refresh_request,
 			'client/registerCapability': self.handle_registration_request,
 			'client/unregisterCapability': self.handle_unregistration_request,
-			'initialize': self.handle_initialize_request,
-			'shutdown': self.handle_shutdown_request,
+			'initialize': self.handle_initialize_result,
+			'shutdown': self.handle_shutdown_result,
 			'window/showMessageRequest': self.handle_show_message_request,
-			'textDocument/willSaveWaitUntil': self.handle_will_save_text_document_wait_until_request,
-			'textDocument/completion': self.handle_completion_request,
-			'completionItem/resolve': self.handle_completion_resolve_request,
-			'textDocument/hover': self.handle_hover_request,
-			'textDocument/signatureHelp': self.handle_signature_help_request,
-			'textDocument/definition': self.handle_definition_request,
-			'textDocument/references': self.handle_references_request,
-			'textDocument/documentHighlight': self.handle_document_highlight_request,
-			'textDocument/documentSymbol': self.handle_document_symbol_request,
-			'textDocument/codeAction': self.handle_code_action_request,
-			'codeAction/resolve': self.handle_code_action_resolve_request,
-			'workspace/symbol': self.handle_workspace_symbol_request,
-			'workspaceSymbol/resolve': self.handle_workspace_symbol_resolve_request,
-			'textDocument/codeLens': self.handle_code_lens_request,
-			'codeLens/resolve': self.handle_code_lens_resolve_request,
+			'textDocument/willSaveWaitUntil': self.handle_will_save_text_document_wait_until_result,
+			'textDocument/completion': self.handle_completion_result,
+			'completionItem/resolve': self.handle_completion_resolve_result,
+			'textDocument/hover': self.handle_hover_result,
+			'textDocument/signatureHelp': self.handle_signature_help_result,
+			'textDocument/definition': self.handle_definition_result,
+			'textDocument/references': self.handle_references_result,
+			'textDocument/documentHighlight': self.handle_document_highlight_result,
+			'textDocument/documentSymbol': self.handle_document_symbol_result,
+			'textDocument/codeAction': self.handle_code_action_result,
+			'codeAction/resolve': self.handle_code_action_resolve_result,
+			'workspace/symbol': self.handle_workspace_symbol_result,
+			'workspaceSymbol/resolve': self.handle_workspace_symbol_resolve_result,
+			'textDocument/codeLens': self.handle_code_lens_result,
+			'codeLens/resolve': self.handle_code_lens_resolve_result,
 			'workspace/codeLens/refresh': self.handle_code_lens_refresh_request,
-			'textDocument/documentLink': self.handle_document_link_request,
-			'documentLink/resolve': self.handle_document_link_resolve_request,
-			'textDocument/formatting': self.handle_document_formatting_request,
-			'textDocument/rangeFormatting': self.handle_document_range_formatting_request,
-			'textDocument/rangesFormatting': self.handle_document_ranges_formatting_request,
-			'textDocument/onTypeFormatting': self.handle_document_on_type_formatting_request,
-			'textDocument/rename': self.handle_rename_request,
-			'textDocument/prepareRename': self.handle_prepare_rename_request,
-			'workspace/executeCommand': self.handle_execute_command_request,
+			'textDocument/documentLink': self.handle_document_link_result,
+			'documentLink/resolve': self.handle_document_link_resolve_result,
+			'textDocument/formatting': self.handle_document_formatting_result,
+			'textDocument/rangeFormatting': self.handle_document_range_formatting_result,
+			'textDocument/rangesFormatting': self.handle_document_ranges_formatting_result,
+			'textDocument/onTypeFormatting': self.handle_document_on_type_formatting_result,
+			'textDocument/rename': self.handle_rename_result,
+			'textDocument/prepareRename': self.handle_prepare_rename_result,
+			'workspace/executeCommand': self.handle_execute_command_result,
 			'workspace/applyEdit': self.handle_apply_workspace_edit_request,
 			'window/showMessage': self.handle_show_message_notification,
 			'window/logMessage': self.handle_log_message_notification,
