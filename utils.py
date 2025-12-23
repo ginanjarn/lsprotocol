@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, is_dataclass
 from enum import Enum
 from typing import (
     TypedDict,
@@ -14,31 +14,29 @@ from typing import (
 
 
 def get_default_value(
-    typ: TypedDict, *, only_required: bool = False, recursive: bool = False
+    typ: type, *, only_required: bool = False, recursive: bool = False
 ) -> dict:
-    """Get TypedDict default value
+    """Get 'type' default value
 
     * only_required: ignore field annotated with NotRequired
     * recursive: get value for field annotated with TypedDict class,
       if False(default) return 'MissingValue' object
 
     """
-    return TypedDictValue(typ, only_required, recursive).get_default()
+    return TypeValue(typ, only_required, recursive).get_default()
 
 
-class TypedDictValue:
-    """TypedDict default value generator"""
+class TypeValue:
+    """TypeValue default value generator"""
 
-    def __init__(
-        self, typ: TypedDict, only_required: bool = False, recursive: bool = False
-    ):
+    def __init__(self, typ: type, only_required: bool = False, recursive: bool = False):
         self.typ = typ
         self.only_required = only_required
         self.recursive = recursive
 
     def get_default(self) -> dict:
         """get default value"""
-        return self._get_typeddict_default(self.typ)
+        return self._get_type_default(self.typ)
 
     def _get_typeddict_default(self, typ: TypedDict):
         data = {}
@@ -57,6 +55,10 @@ class TypedDictValue:
                 data[key] = self._get_type_default(type_)
 
         return data
+
+    def _get_dataclass_default(self, typ: type) -> object:
+        kwargs = {k: self._get_type_default(v) for k, v in get_type_hints(typ).items()}
+        return typ(**kwargs)
 
     def _get_valueset_default(self, typ: List[Enum]) -> List[object]:
         origin = get_origin(typ)
@@ -101,6 +103,9 @@ class TypedDictValue:
             if not self.recursive:
                 return MissingValue(typ)
             return self._get_typeddict_default(typ)
+
+        if is_dataclass(typ):
+            return self._get_dataclass_default(typ)
 
         raise ValueError(f"unable get default value for {typ}")
 
