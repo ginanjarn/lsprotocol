@@ -1,5 +1,6 @@
 from dataclasses import dataclass, is_dataclass
 from enum import Enum
+from functools import wraps
 from typing import (
     TypedDict,
     Union,
@@ -10,6 +11,8 @@ from typing import (
     get_args,
     get_type_hints,
     is_typeddict,
+    Callable,
+    Any,
 )
 
 
@@ -34,10 +37,30 @@ class TypeValue:
         self.only_required = only_required
         self.recursive = recursive
 
+        self._enter_recursion = False
+
+    def check_recursion(func: Callable[[...], Any]) -> Any:
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self._enter_recursion and not self.recursive:
+                try:
+                    typ = args[0]
+                except IndexError:
+                    typ = kwargs["typ"]
+                return RequiredValue(typ)
+
+            self._enter_recursion = True
+            ret = func(self, *args, **kwargs)
+            self._enter_recursion = False
+            return ret
+
+        return wrapper
+
     def get_default(self) -> dict:
         """get default value"""
         return self._get_type_default(self.typ)
 
+    @check_recursion
     def _get_typeddict_default(self, typ: TypedDict):
         data = {}
         type_hints = get_type_hints(typ)
@@ -56,6 +79,7 @@ class TypeValue:
 
         return data
 
+    @check_recursion
     def _get_dataclass_default(self, typ: type) -> object:
         kwargs = {k: self._get_type_default(v) for k, v in get_type_hints(typ).items()}
         return typ(**kwargs)
@@ -100,8 +124,6 @@ class TypeValue:
             return list(typ)[0].value
 
         if is_typeddict(typ):
-            if not self.recursive:
-                return MissingValue(typ)
             return self._get_typeddict_default(typ)
 
         if is_dataclass(typ):
@@ -111,5 +133,5 @@ class TypeValue:
 
 
 @dataclass
-class MissingValue:
-    value: object
+class RequiredValue:
+    type_: type
