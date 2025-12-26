@@ -590,7 +590,7 @@ class CodeGenerator:
         if tp.extends:
             parents += [self.type_(p) for p in tp.extends]
         else:
-            parents += ["TypedDict"]
+            parents += ["TypedDict", "total=False"]
 
         properties = tp.properties or list()
         if tp.mixins:
