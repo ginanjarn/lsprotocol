@@ -828,7 +828,7 @@ class Client:
 	def notify(self, method: str, params: LSPAny) -> None:
 		raise NotImplementedError("notify")
 
-	def handle(self, method: str, params_or_result: LSPAny) -> None:
+	def handle(self, context: dict, method: str, params_or_result: LSPAny) -> None:
 		handle_map = {
 			'textDocument/implementation': self.handle_implementation_result,
 			'textDocument/typeDefinition': self.handle_type_definition_result,
@@ -907,5 +907,5 @@ class Client:
 			'$/cancelRequest': self.handle_cancel_notification,
 			'$/progress': self.handle_progress_notification
 			}
-		return handle_map[method](params_or_result)
+		return handle_map[method](context, params_or_result)
 

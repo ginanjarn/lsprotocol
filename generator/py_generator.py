@@ -297,7 +297,7 @@ class CodeGenerator:
         )
         body = (
             f"handle_map = {{\n\t{handle_map}\n\t}}\n"
-            "return handle_map[method](params_or_result)\n"
+            "return handle_map[method](context, params_or_result)\n"
         )
         self._server.methods.extend(
             [
@@ -325,6 +325,7 @@ class CodeGenerator:
                     "handle",
                     arguments=[
                         Argument("self"),
+                        Argument("context", "dict"),
                         Argument("method", "str"),
                         Argument("params_or_result", "LSPAny"),
                     ],
@@ -355,7 +356,7 @@ class CodeGenerator:
         )
         body = (
             f"handle_map = {{\n\t{handle_map}\n\t}}\n"
-            "return handle_map[method](params_or_result)\n"
+            "return handle_map[method](context, params_or_result)\n"
         )
 
         self._client.methods.extend(
@@ -384,6 +385,7 @@ class CodeGenerator:
                     "handle",
                     arguments=[
                         Argument("self"),
+                        Argument("context", "dict"),
                         Argument("method", "str"),
                         Argument("params_or_result", "LSPAny"),
                     ],
