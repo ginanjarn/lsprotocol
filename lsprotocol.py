@@ -4,7 +4,11 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+
 from enum import Enum
+
+from functools import partial
 
 from typing import (
 	List,
@@ -12,10 +16,10 @@ from typing import (
 	Union,
 	Tuple,
 	Literal,
-	TypeAlias,
-	TypedDict,
-	NotRequired
+	TypeAlias
 )
+
+optional_field = partial(field, metadata={"optional": True})
 
 uinteger: TypeAlias = int
 
@@ -394,13 +398,15 @@ class TokenFormat(str, Enum):
 	Relative = 'relative'
 
 
-class TextDocumentIdentifier(TypedDict, total=False):
+@dataclass
+class TextDocumentIdentifier:
 	"""A literal to identify a text document in the client."""
 	uri: DocumentUri
 	"""The text document's uri."""
 
 
-class Position(TypedDict, total=False):
+@dataclass
+class Position:
 	r"""Position in a text document expressed as zero-based line and character
 	offset. Prior to 3.17 the offsets were always based on a UTF-16 string
 	representation. So a string of the form `a𐐀b` the character offset of the
@@ -437,7 +443,8 @@ class Position(TypedDict, total=False):
 	`PositionEncodingKind`."""
 
 
-class TextDocumentPositionParams(TypedDict, total=False):
+@dataclass
+class TextDocumentPositionParams:
 	"""A parameter literal used in requests to pass a text document and a position inside that
 	document."""
 	textDocument: TextDocumentIdentifier
@@ -448,15 +455,17 @@ class TextDocumentPositionParams(TypedDict, total=False):
 
 ProgressToken: TypeAlias = Union[int, str]
 
+@dataclass
 class ImplementationParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class Range(TypedDict, total=False):
+@dataclass
+class Range:
 	"""A range in a text document expressed as (zero-based) start and end positions.
 
 	If you want to specify a range that contains a line including the line ending
@@ -474,7 +483,8 @@ class Range(TypedDict, total=False):
 	"""The range's end position."""
 
 
-class Location(TypedDict, total=False):
+@dataclass
+class Location:
 	"""Represents a location inside a resource, such as a line
 	inside a text file."""
 	uri: DocumentUri
@@ -492,7 +502,8 @@ Pattern: TypeAlias = str
 
 @since 3.17.0"""
 
-class WorkspaceFolder(TypedDict, total=False):
+@dataclass
+class WorkspaceFolder:
 	"""A workspace folder inside a client."""
 	uri: URI
 	"""The associated URI for this workspace folder."""
@@ -501,7 +512,8 @@ class WorkspaceFolder(TypedDict, total=False):
 	workspace folder in the user interface."""
 
 
-class RelativePattern(TypedDict, total=False):
+@dataclass
+class RelativePattern:
 	"""A relative pattern is a helper to construct glob patterns that are matched
 	relatively to a base URI. The common value for a `baseUri` is a workspace
 	folder root, but it can be another absolute URI as well.
@@ -519,15 +531,16 @@ GlobPattern: TypeAlias = Union[Pattern, RelativePattern]
 
 @since 3.17.0"""
 
-class TextDocumentFilterLanguage(TypedDict, total=False):
+@dataclass
+class TextDocumentFilterLanguage:
 	"""A document filter where `language` is required field.
 
 	@since 3.18.0"""
 	language: str
 	"""A language id, like `typescript`."""
-	scheme: NotRequired[str]
+	scheme: str = optional_field()
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
-	pattern: NotRequired[GlobPattern]
+	pattern: GlobPattern = optional_field()
 	"""A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
 
 	@since 3.18.0 - support for relative patterns. Whether clients support
@@ -535,15 +548,16 @@ class TextDocumentFilterLanguage(TypedDict, total=False):
 	`textDocuments.filters.relativePatternSupport`."""
 
 
-class TextDocumentFilterScheme(TypedDict, total=False):
+@dataclass
+class TextDocumentFilterScheme:
 	"""A document filter where `scheme` is required field.
 
 	@since 3.18.0"""
-	language: NotRequired[str]
+	language: str = optional_field()
 	"""A language id, like `typescript`."""
 	scheme: str
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
-	pattern: NotRequired[GlobPattern]
+	pattern: GlobPattern = optional_field()
 	"""A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
 
 	@since 3.18.0 - support for relative patterns. Whether clients support
@@ -551,13 +565,14 @@ class TextDocumentFilterScheme(TypedDict, total=False):
 	`textDocuments.filters.relativePatternSupport`."""
 
 
-class TextDocumentFilterPattern(TypedDict, total=False):
+@dataclass
+class TextDocumentFilterPattern:
 	"""A document filter where `pattern` is required field.
 
 	@since 3.18.0"""
-	language: NotRequired[str]
+	language: str = optional_field()
 	"""A language id, like `typescript`."""
-	scheme: NotRequired[str]
+	scheme: str = optional_field()
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
 	pattern: GlobPattern
 	"""A glob pattern, like **​/*.{ts,js}. See TextDocumentFilter for examples.
@@ -585,37 +600,40 @@ Glob patterns can have the following syntax:
 
 @since 3.17.0"""
 
-class NotebookDocumentFilterNotebookType(TypedDict, total=False):
+@dataclass
+class NotebookDocumentFilterNotebookType:
 	"""A notebook document filter where `notebookType` is required field.
 
 	@since 3.18.0"""
 	notebookType: str
 	"""The type of the enclosing notebook."""
-	scheme: NotRequired[str]
+	scheme: str = optional_field()
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
-	pattern: NotRequired[GlobPattern]
+	pattern: GlobPattern = optional_field()
 	"""A glob pattern."""
 
 
-class NotebookDocumentFilterScheme(TypedDict, total=False):
+@dataclass
+class NotebookDocumentFilterScheme:
 	"""A notebook document filter where `scheme` is required field.
 
 	@since 3.18.0"""
-	notebookType: NotRequired[str]
+	notebookType: str = optional_field()
 	"""The type of the enclosing notebook."""
 	scheme: str
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
-	pattern: NotRequired[GlobPattern]
+	pattern: GlobPattern = optional_field()
 	"""A glob pattern."""
 
 
-class NotebookDocumentFilterPattern(TypedDict, total=False):
+@dataclass
+class NotebookDocumentFilterPattern:
 	"""A notebook document filter where `pattern` is required field.
 
 	@since 3.18.0"""
-	notebookType: NotRequired[str]
+	notebookType: str = optional_field()
 	"""The type of the enclosing notebook."""
-	scheme: NotRequired[str]
+	scheme: str = optional_field()
 	"""A Uri {@link Uri.scheme scheme}, like `file` or `untitled`."""
 	pattern: GlobPattern
 	"""A glob pattern."""
@@ -628,7 +646,8 @@ against the notebook's URI (same as with documents)
 
 @since 3.17.0"""
 
-class NotebookCellTextDocumentFilter(TypedDict, total=False):
+@dataclass
+class NotebookCellTextDocumentFilter:
 	"""A notebook cell text document filter denotes a cell text
 	document by different properties.
 
@@ -638,7 +657,7 @@ class NotebookCellTextDocumentFilter(TypedDict, total=False):
 	containing the notebook cell. If a string
 	value is provided it matches against the
 	notebook type. '*' matches every notebook."""
-	language: NotRequired[str]
+	language: str = optional_field()
 	"""A language id like `python`.
 
 	Will be matched against the language id of the
@@ -658,42 +677,49 @@ DocumentSelector: TypeAlias = List[DocumentFilter]
 
 The use of a string as a document filter is deprecated @since 3.16.0."""
 
-class TextDocumentRegistrationOptions(TypedDict, total=False):
+@dataclass
+class TextDocumentRegistrationOptions:
 	"""General text document registration options."""
 	documentSelector: Union[DocumentSelector, None]
 	"""A document selector to identify the scope of the registration. If set to null
 	the document selector provided on the client side will be used."""
 
 
-class ImplementationOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class ImplementationOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class ImplementationRegistrationOptions(TextDocumentRegistrationOptions, ImplementationOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
+@dataclass
 class TypeDefinitionParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class TypeDefinitionOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class TypeDefinitionOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class TypeDefinitionRegistrationOptions(TextDocumentRegistrationOptions, TypeDefinitionOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class WorkspaceFoldersChangeEvent(TypedDict, total=False):
+@dataclass
+class WorkspaceFoldersChangeEvent:
 	"""The workspace folder change event."""
 	added: List[WorkspaceFolder]
 	"""The array of added workspace folders"""
@@ -701,36 +727,41 @@ class WorkspaceFoldersChangeEvent(TypedDict, total=False):
 	"""The array of the removed workspace folders"""
 
 
-class DidChangeWorkspaceFoldersParams(TypedDict, total=False):
+@dataclass
+class DidChangeWorkspaceFoldersParams:
 	"""The parameters of a `workspace/didChangeWorkspaceFolders` notification."""
 	event: WorkspaceFoldersChangeEvent
 	"""The actual workspace folder change event."""
 
 
-class ConfigurationItem(TypedDict, total=False):
-	scopeUri: NotRequired[URI]
+@dataclass
+class ConfigurationItem:
+	scopeUri: URI = optional_field()
 	"""The scope to get the configuration section for."""
-	section: NotRequired[str]
+	section: str = optional_field()
 	"""The configuration section asked for."""
 
 
-class ConfigurationParams(TypedDict, total=False):
+@dataclass
+class ConfigurationParams:
 	"""The parameters of a configuration request."""
 	items: List[ConfigurationItem]
 
 
-class DocumentColorParams(TypedDict, total=False):
+@dataclass
+class DocumentColorParams:
 	"""Parameters for a {@link DocumentColorRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class Color(TypedDict, total=False):
+@dataclass
+class Color:
 	"""Represents a color in RGBA space."""
 	red: float
 	"""The red component of this color in the range [0-1]."""
@@ -742,7 +773,8 @@ class Color(TypedDict, total=False):
 	"""The alpha component of this color in the range [0-1]."""
 
 
-class ColorInformation(TypedDict, total=False):
+@dataclass
+class ColorInformation:
 	"""Represents a color range from a document."""
 	range: Range
 	"""The range in the document where this color appears."""
@@ -750,17 +782,20 @@ class ColorInformation(TypedDict, total=False):
 	"""The actual color value for this color range."""
 
 
-class DocumentColorOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class DocumentColorOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class DocumentColorRegistrationOptions(TextDocumentRegistrationOptions, DocumentColorOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class ColorPresentationParams(TypedDict, total=False):
+@dataclass
+class ColorPresentationParams:
 	"""Parameters for a {@link ColorPresentationRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
@@ -768,14 +803,15 @@ class ColorPresentationParams(TypedDict, total=False):
 	"""The color to request presentations for."""
 	range: Range
 	"""The range where the color would be inserted. Serves as a context."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class TextEdit(TypedDict, total=False):
+@dataclass
+class TextEdit:
 	"""A text edit applicable to a text document."""
 	range: Range
 	"""The range of the text document to be manipulated. To insert
@@ -785,53 +821,57 @@ class TextEdit(TypedDict, total=False):
 	empty string."""
 
 
-class ColorPresentation(TypedDict, total=False):
+@dataclass
+class ColorPresentation:
 	label: str
 	"""The label of this color presentation. It will be shown on the color
 	picker header. By default this is also the text that is inserted when selecting
 	this color presentation."""
-	textEdit: NotRequired[TextEdit]
+	textEdit: TextEdit = optional_field()
 	"""An {@link TextEdit edit} which is applied to a document when selecting
 	this presentation for the color.  When `falsy` the {@link ColorPresentation.label label}
 	is used."""
-	additionalTextEdits: NotRequired[List[TextEdit]]
+	additionalTextEdits: List[TextEdit] = optional_field()
 	"""An optional array of additional {@link TextEdit text edits} that are applied when
 	selecting this color presentation. Edits must not overlap with the main {@link ColorPresentation.textEdit edit} nor with themselves."""
 
 
-class WorkDoneProgressOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class WorkDoneProgressOptions:
+	workDoneProgress: bool = optional_field()
 
 
-class FoldingRangeParams(TypedDict, total=False):
+@dataclass
+class FoldingRangeParams:
 	"""Parameters for a {@link FoldingRangeRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class FoldingRange(TypedDict, total=False):
+@dataclass
+class FoldingRange:
 	"""Represents a folding range. To be valid, start and end line must be bigger than zero and smaller
 	than the number of lines in the document. Clients are free to ignore invalid ranges."""
 	startLine: uinteger
 	"""The zero-based start line of the range to fold. The folded area starts after the line's last character.
 	To be valid, the end must be zero or larger and smaller than the number of lines in the document."""
-	startCharacter: NotRequired[uinteger]
+	startCharacter: uinteger = optional_field()
 	"""The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line."""
 	endLine: uinteger
 	"""The zero-based end line of the range to fold. The folded area ends with the line's last character.
 	To be valid, the end must be zero or larger and smaller than the number of lines in the document."""
-	endCharacter: NotRequired[uinteger]
+	endCharacter: uinteger = optional_field()
 	"""The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line."""
-	kind: NotRequired[FoldingRangeKind]
+	kind: FoldingRangeKind = optional_field()
 	"""Describes the kind of the folding range such as 'comment' or 'region'. The kind
 	is used to categorize folding ranges and used by commands like 'Fold all comments'.
 	See {@link FoldingRangeKind} for an enumeration of standardized kinds."""
-	collapsedText: NotRequired[str]
+	collapsedText: str = optional_field()
 	"""The text that the client should show when the specified range is
 	collapsed. If not defined or not supported by the client, a default
 	will be chosen by the client.
@@ -839,81 +879,93 @@ class FoldingRange(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class FoldingRangeOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class FoldingRangeOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class FoldingRangeRegistrationOptions(TextDocumentRegistrationOptions, FoldingRangeOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
+@dataclass
 class DeclarationParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class DeclarationOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class DeclarationOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class DeclarationRegistrationOptions(DeclarationOptions, TextDocumentRegistrationOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class SelectionRangeParams(TypedDict, total=False):
+@dataclass
+class SelectionRangeParams:
 	"""A parameter literal used in selection range requests."""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
 	positions: List[Position]
 	"""The positions inside the text document."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class SelectionRange(TypedDict, total=False):
+@dataclass
+class SelectionRange:
 	"""A selection range represents a part of a selection hierarchy. A selection range
 	may have a parent selection range that contains it."""
 	range: Range
 	"""The {@link Range range} of this selection range."""
-	parent: NotRequired["SelectionRange"]
+	parent: "SelectionRange" = optional_field()
 	"""The parent selection range containing this range. Therefore `parent.range` must contain `this.range`."""
 
 
-class SelectionRangeOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class SelectionRangeOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class SelectionRangeRegistrationOptions(SelectionRangeOptions, TextDocumentRegistrationOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class WorkDoneProgressCreateParams(TypedDict, total=False):
+@dataclass
+class WorkDoneProgressCreateParams:
 	token: ProgressToken
 	"""The token to be used to report progress."""
 
 
-class WorkDoneProgressCancelParams(TypedDict, total=False):
+@dataclass
+class WorkDoneProgressCancelParams:
 	token: ProgressToken
 	"""The token to be used to report progress."""
 
 
+@dataclass
 class CallHierarchyPrepareParams(TextDocumentPositionParams):
 	"""The parameter of a `textDocument/prepareCallHierarchy` request.
 
 	@since 3.16.0"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
@@ -933,7 +985,8 @@ LSPArray: TypeAlias = List[LSPAny]
 """LSP arrays.
 @since 3.17.0"""
 
-class CallHierarchyItem(TypedDict, total=False):
+@dataclass
+class CallHierarchyItem:
 	"""Represents programming constructs like functions or constructors in the context
 	of call hierarchy.
 
@@ -942,9 +995,9 @@ class CallHierarchyItem(TypedDict, total=False):
 	"""The name of this item."""
 	kind: SymbolKind
 	"""The kind of this item."""
-	tags: NotRequired[List[SymbolTag]]
+	tags: List[SymbolTag] = optional_field()
 	"""Tags for this item."""
-	detail: NotRequired[str]
+	detail: str = optional_field()
 	"""More detail for this item, e.g. the signature of a function."""
 	uri: DocumentUri
 	"""The resource identifier of this item."""
@@ -953,40 +1006,44 @@ class CallHierarchyItem(TypedDict, total=False):
 	selectionRange: Range
 	"""The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
 	Must be contained by the {@link CallHierarchyItem.range `range`}."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved between a call hierarchy prepare and
 	incoming calls or outgoing calls requests."""
 
 
-class CallHierarchyOptions(TypedDict, total=False):
+@dataclass
+class CallHierarchyOptions:
 	"""Call hierarchy options used during static registration.
 
 	@since 3.16.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class CallHierarchyRegistrationOptions(TextDocumentRegistrationOptions, CallHierarchyOptions):
 	"""Call hierarchy options used during static or dynamic registration.
 
 	@since 3.16.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class CallHierarchyIncomingCallsParams(TypedDict, total=False):
+@dataclass
+class CallHierarchyIncomingCallsParams:
 	"""The parameter of a `callHierarchy/incomingCalls` request.
 
 	@since 3.16.0"""
 	item: CallHierarchyItem
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CallHierarchyIncomingCall(TypedDict, total=False):
+@dataclass
+class CallHierarchyIncomingCall:
 	"""Represents an incoming call, e.g. a caller of a method or constructor.
 
 	@since 3.16.0"""
@@ -997,19 +1054,21 @@ class CallHierarchyIncomingCall(TypedDict, total=False):
 	denoted by {@link CallHierarchyIncomingCall.from `this.from`}."""
 
 
-class CallHierarchyOutgoingCallsParams(TypedDict, total=False):
+@dataclass
+class CallHierarchyOutgoingCallsParams:
 	"""The parameter of a `callHierarchy/outgoingCalls` request.
 
 	@since 3.16.0"""
 	item: CallHierarchyItem
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CallHierarchyOutgoingCall(TypedDict, total=False):
+@dataclass
+class CallHierarchyOutgoingCall:
 	"""Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
 
 	@since 3.16.0"""
@@ -1021,20 +1080,22 @@ class CallHierarchyOutgoingCall(TypedDict, total=False):
 	and not {@link CallHierarchyOutgoingCall.to `this.to`}."""
 
 
-class SemanticTokensParams(TypedDict, total=False):
+@dataclass
+class SemanticTokensParams:
 	"""@since 3.16.0"""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class SemanticTokens(TypedDict, total=False):
+@dataclass
+class SemanticTokens:
 	"""@since 3.16.0"""
-	resultId: NotRequired[str]
+	resultId: str = optional_field()
 	"""An optional result id. If provided and clients support delta updating
 	the client will include the result id in the next semantic token request.
 	A server can then instead of computing all semantic tokens again simply
@@ -1043,12 +1104,14 @@ class SemanticTokens(TypedDict, total=False):
 	"""The actual tokens."""
 
 
-class SemanticTokensPartialResult(TypedDict, total=False):
+@dataclass
+class SemanticTokensPartialResult:
 	"""@since 3.16.0"""
 	data: List[uinteger]
 
 
-class SemanticTokensLegend(TypedDict, total=False):
+@dataclass
+class SemanticTokensLegend:
 	"""@since 3.16.0"""
 	tokenTypes: List[str]
 	"""The token types a server uses."""
@@ -1056,105 +1119,115 @@ class SemanticTokensLegend(TypedDict, total=False):
 	"""The token modifiers a server uses."""
 
 
-class SemanticTokensFullDelta(TypedDict, total=False):
+@dataclass
+class SemanticTokensFullDelta:
 	"""Semantic tokens options to support deltas for full documents
 
 	@since 3.18.0"""
-	delta: NotRequired[bool]
+	delta: bool = optional_field()
 	"""The server supports deltas for full documents."""
 
 
-class SemanticTokensOptions(TypedDict, total=False):
+@dataclass
+class SemanticTokensOptions:
 	"""@since 3.16.0"""
 	legend: SemanticTokensLegend
 	"""The legend used by the server"""
-	range: NotRequired[Union[bool, Literal['']]]
+	range: Union[bool, Literal['']] = optional_field()
 	"""Server supports providing semantic tokens for a specific range
 	of a document."""
-	full: NotRequired[Union[bool, SemanticTokensFullDelta]]
+	full: Union[bool, SemanticTokensFullDelta] = optional_field()
 	"""Server supports providing semantic tokens for a full document."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class SemanticTokensRegistrationOptions(TextDocumentRegistrationOptions, SemanticTokensOptions):
 	"""@since 3.16.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class SemanticTokensDeltaParams(TypedDict, total=False):
+@dataclass
+class SemanticTokensDeltaParams:
 	"""@since 3.16.0"""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
 	previousResultId: str
 	"""The result id of a previous response. The result Id can either point to a full response
 	or a delta response depending on what was received last."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class SemanticTokensEdit(TypedDict, total=False):
+@dataclass
+class SemanticTokensEdit:
 	"""@since 3.16.0"""
 	start: uinteger
 	"""The start offset of the edit."""
 	deleteCount: uinteger
 	"""The count of elements to remove."""
-	data: NotRequired[List[uinteger]]
+	data: List[uinteger] = optional_field()
 	"""The elements to insert."""
 
 
-class SemanticTokensDelta(TypedDict, total=False):
+@dataclass
+class SemanticTokensDelta:
 	"""@since 3.16.0"""
-	resultId: NotRequired[str]
+	resultId: str = optional_field()
 	edits: List[SemanticTokensEdit]
 	"""The semantic token edits to transform a previous result into a new result."""
 
 
-class SemanticTokensDeltaPartialResult(TypedDict, total=False):
+@dataclass
+class SemanticTokensDeltaPartialResult:
 	"""@since 3.16.0"""
 	edits: List[SemanticTokensEdit]
 
 
-class SemanticTokensRangeParams(TypedDict, total=False):
+@dataclass
+class SemanticTokensRangeParams:
 	"""@since 3.16.0"""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
 	range: Range
 	"""The range the semantic tokens are requested for."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class ShowDocumentParams(TypedDict, total=False):
+@dataclass
+class ShowDocumentParams:
 	"""Params to show a resource in the UI.
 
 	@since 3.16.0"""
 	uri: URI
 	"""The uri to show."""
-	external: NotRequired[bool]
+	external: bool = optional_field()
 	"""Indicates to show the resource in an external program.
 	To show, for example, `https://code.visualstudio.com/`
 	in the default WEB browser set `external` to `true`."""
-	takeFocus: NotRequired[bool]
+	takeFocus: bool = optional_field()
 	"""An optional property to indicate whether the editor
 	showing the document should take focus or not.
 	Clients might ignore this property if an external
 	program is started."""
-	selection: NotRequired[Range]
+	selection: Range = optional_field()
 	"""An optional selection range if the document is a text
 	document. Clients might ignore the property if an
 	external program is started or the file is not a text
 	file."""
 
 
-class ShowDocumentResult(TypedDict, total=False):
+@dataclass
+class ShowDocumentResult:
 	"""The result of a showDocument request.
 
 	@since 3.16.0"""
@@ -1162,35 +1235,40 @@ class ShowDocumentResult(TypedDict, total=False):
 	"""A boolean indicating if the show was successful."""
 
 
+@dataclass
 class LinkedEditingRangeParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class LinkedEditingRanges(TypedDict, total=False):
+@dataclass
+class LinkedEditingRanges:
 	"""The result of a linked editing range request.
 
 	@since 3.16.0"""
 	ranges: List[Range]
 	"""A list of ranges that can be edited together. The ranges must have
 	identical length and contain identical text content. The ranges cannot overlap."""
-	wordPattern: NotRequired[str]
+	wordPattern: str = optional_field()
 	"""An optional word pattern (regular expression) that describes valid contents for
 	the given ranges. If no pattern is provided, the client configuration's word
 	pattern will be used."""
 
 
-class LinkedEditingRangeOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class LinkedEditingRangeOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class LinkedEditingRangeRegistrationOptions(TextDocumentRegistrationOptions, LinkedEditingRangeOptions):
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class FileCreate(TypedDict, total=False):
+@dataclass
+class FileCreate:
 	"""Represents information on a file/folder create.
 
 	@since 3.16.0"""
@@ -1198,7 +1276,8 @@ class FileCreate(TypedDict, total=False):
 	"""A file:// URI for the location of the file/folder being created."""
 
 
-class CreateFilesParams(TypedDict, total=False):
+@dataclass
+class CreateFilesParams:
 	"""The parameters sent in notifications/requests for user-initiated creation of
 	files.
 
@@ -1207,6 +1286,7 @@ class CreateFilesParams(TypedDict, total=False):
 	"""An array of all files/folders created in this operation."""
 
 
+@dataclass
 class OptionalVersionedTextDocumentIdentifier(TextDocumentIdentifier):
 	"""A text document identifier to optionally denote a specific version of a text document."""
 	version: Union[int, None]
@@ -1220,6 +1300,7 @@ class OptionalVersionedTextDocumentIdentifier(TextDocumentIdentifier):
 ChangeAnnotationIdentifier: TypeAlias = str
 """An identifier to refer to a change annotation stored with a workspace edit."""
 
+@dataclass
 class AnnotatedTextEdit(TextEdit):
 	"""A special text edit with an additional change annotation.
 
@@ -1228,7 +1309,8 @@ class AnnotatedTextEdit(TextEdit):
 	"""The actual identifier of the change annotation"""
 
 
-class StringValue(TypedDict, total=False):
+@dataclass
+class StringValue:
 	"""A string value used as a snippet is a template which allows to insert text
 	and to control the editor cursor when insertion happens.
 
@@ -1245,7 +1327,8 @@ class StringValue(TypedDict, total=False):
 	"""The snippet string."""
 
 
-class SnippetTextEdit(TypedDict, total=False):
+@dataclass
+class SnippetTextEdit:
 	"""An interactive text edit.
 
 	@since 3.18.0
@@ -1254,11 +1337,12 @@ class SnippetTextEdit(TypedDict, total=False):
 	"""The range of the text document to be manipulated."""
 	snippet: StringValue
 	"""The snippet to be inserted."""
-	annotationId: NotRequired[ChangeAnnotationIdentifier]
+	annotationId: ChangeAnnotationIdentifier = optional_field()
 	"""The actual identifier of the snippet edit."""
 
 
-class TextDocumentEdit(TypedDict, total=False):
+@dataclass
+class TextDocumentEdit:
 	"""Describes textual changes on a text document. A TextDocumentEdit describes all changes
 	on a document version Si and after they are applied move the document to version Si+1.
 	So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
@@ -1275,42 +1359,47 @@ class TextDocumentEdit(TypedDict, total=False):
 	client capability."""
 
 
-class ResourceOperation(TypedDict, total=False):
+@dataclass
+class ResourceOperation:
 	"""A generic resource operation."""
 	kind: str
 	"""The resource operation kind."""
-	annotationId: NotRequired[ChangeAnnotationIdentifier]
+	annotationId: ChangeAnnotationIdentifier = optional_field()
 	"""An optional annotation identifier describing the operation.
 
 	@since 3.16.0"""
 
 
-class CreateFileOptions(TypedDict, total=False):
+@dataclass
+class CreateFileOptions:
 	"""Options to create a file."""
-	overwrite: NotRequired[bool]
+	overwrite: bool = optional_field()
 	"""Overwrite existing file. Overwrite wins over `ignoreIfExists`"""
-	ignoreIfExists: NotRequired[bool]
+	ignoreIfExists: bool = optional_field()
 	"""Ignore if exists."""
 
 
+@dataclass
 class CreateFile(ResourceOperation):
 	"""Create file operation."""
 	kind: Literal['create']
 	"""A create"""
 	uri: DocumentUri
 	"""The resource to create."""
-	options: NotRequired[CreateFileOptions]
+	options: CreateFileOptions = optional_field()
 	"""Additional options"""
 
 
-class RenameFileOptions(TypedDict, total=False):
+@dataclass
+class RenameFileOptions:
 	"""Rename file options"""
-	overwrite: NotRequired[bool]
+	overwrite: bool = optional_field()
 	"""Overwrite target if existing. Overwrite wins over `ignoreIfExists`"""
-	ignoreIfExists: NotRequired[bool]
+	ignoreIfExists: bool = optional_field()
 	"""Ignores if target exists."""
 
 
+@dataclass
 class RenameFile(ResourceOperation):
 	"""Rename file operation"""
 	kind: Literal['rename']
@@ -1319,44 +1408,48 @@ class RenameFile(ResourceOperation):
 	"""The old (existing) location."""
 	newUri: DocumentUri
 	"""The new location."""
-	options: NotRequired[RenameFileOptions]
+	options: RenameFileOptions = optional_field()
 	"""Rename options."""
 
 
-class DeleteFileOptions(TypedDict, total=False):
+@dataclass
+class DeleteFileOptions:
 	"""Delete file options"""
-	recursive: NotRequired[bool]
+	recursive: bool = optional_field()
 	"""Delete the content recursively if a folder is denoted."""
-	ignoreIfNotExists: NotRequired[bool]
+	ignoreIfNotExists: bool = optional_field()
 	"""Ignore the operation if the file doesn't exist."""
 
 
+@dataclass
 class DeleteFile(ResourceOperation):
 	"""Delete file operation"""
 	kind: Literal['delete']
 	"""A delete"""
 	uri: DocumentUri
 	"""The file to delete."""
-	options: NotRequired[DeleteFileOptions]
+	options: DeleteFileOptions = optional_field()
 	"""Delete options."""
 
 
-class ChangeAnnotation(TypedDict, total=False):
+@dataclass
+class ChangeAnnotation:
 	"""Additional information that describes document changes.
 
 	@since 3.16.0"""
 	label: str
 	"""A human-readable string describing the actual change. The string
 	is rendered prominent in the user interface."""
-	needsConfirmation: NotRequired[bool]
+	needsConfirmation: bool = optional_field()
 	"""A flag which indicates that user confirmation is needed
 	before applying the change."""
-	description: NotRequired[str]
+	description: str = optional_field()
 	"""A human-readable string which is rendered less prominent in
 	the user interface."""
 
 
-class WorkspaceEdit(TypedDict, total=False):
+@dataclass
+class WorkspaceEdit:
 	"""A workspace edit represents changes to many resources managed in the workspace. The edit
 	should either provide `changes` or `documentChanges`. If documentChanges are present
 	they are preferred over `changes` if the client can handle versioned document edits.
@@ -1369,9 +1462,9 @@ class WorkspaceEdit(TypedDict, total=False):
 	An invalid sequence (e.g. (1) delete file a.txt and (2) insert text into file a.txt) will
 	cause failure of the operation. How the client recovers from the failure is described by
 	the client capability: `workspace.workspaceEdit.failureHandling`"""
-	changes: NotRequired[Dict[DocumentUri, List[TextEdit]]]
+	changes: Dict[DocumentUri, List[TextEdit]] = optional_field()
 	"""Holds changes to existing resources."""
-	documentChanges: NotRequired[List[Union[TextDocumentEdit, CreateFile, RenameFile, DeleteFile]]]
+	documentChanges: List[Union[TextDocumentEdit, CreateFile, RenameFile, DeleteFile]] = optional_field()
 	"""Depending on the client capability `workspace.workspaceEdit.resourceOperations` document changes
 	are either an array of `TextDocumentEdit`s to express changes to n different text documents
 	where each text document edit addresses a specific version of a text document. Or it can contain
@@ -1382,7 +1475,7 @@ class WorkspaceEdit(TypedDict, total=False):
 
 	If a client neither supports `documentChanges` nor `workspace.workspaceEdit.resourceOperations` then
 	only plain `TextEdit`s using the `changes` property are supported."""
-	changeAnnotations: NotRequired[Dict[ChangeAnnotationIdentifier, ChangeAnnotation]]
+	changeAnnotations: Dict[ChangeAnnotationIdentifier, ChangeAnnotation] = optional_field()
 	"""A map of change annotations that can be referenced in `AnnotatedTextEdit`s or create, rename and
 	delete file / folder operations.
 
@@ -1391,15 +1484,17 @@ class WorkspaceEdit(TypedDict, total=False):
 	@since 3.16.0"""
 
 
-class FileOperationPatternOptions(TypedDict, total=False):
+@dataclass
+class FileOperationPatternOptions:
 	"""Matching options for the file operation pattern.
 
 	@since 3.16.0"""
-	ignoreCase: NotRequired[bool]
+	ignoreCase: bool = optional_field()
 	"""The pattern should be matched ignoring casing."""
 
 
-class FileOperationPattern(TypedDict, total=False):
+@dataclass
+class FileOperationPattern:
 	"""A pattern to describe in which file operation requests or notifications
 	the server is interested in receiving.
 
@@ -1412,26 +1507,28 @@ class FileOperationPattern(TypedDict, total=False):
 	- `{}` to group sub patterns into an OR expression. (e.g. `**​/*.{ts,js}` matches all TypeScript and JavaScript files)
 	- `[]` to declare a range of characters to match in a path segment (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)
 	- `[!...]` to negate a range of characters to match in a path segment (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but not `example.0`)"""
-	matches: NotRequired[FileOperationPatternKind]
+	matches: FileOperationPatternKind = optional_field()
 	"""Whether to match files or folders with this pattern.
 
 	Matches both if undefined."""
-	options: NotRequired[FileOperationPatternOptions]
+	options: FileOperationPatternOptions = optional_field()
 	"""Additional options used during matching."""
 
 
-class FileOperationFilter(TypedDict, total=False):
+@dataclass
+class FileOperationFilter:
 	"""A filter to describe in which file operation requests or notifications
 	the server is interested in receiving.
 
 	@since 3.16.0"""
-	scheme: NotRequired[str]
+	scheme: str = optional_field()
 	"""A Uri scheme like `file` or `untitled`."""
 	pattern: FileOperationPattern
 	"""The actual file operation pattern."""
 
 
-class FileOperationRegistrationOptions(TypedDict, total=False):
+@dataclass
+class FileOperationRegistrationOptions:
 	"""The options to register for file operations.
 
 	@since 3.16.0"""
@@ -1439,7 +1536,8 @@ class FileOperationRegistrationOptions(TypedDict, total=False):
 	"""The actual filters."""
 
 
-class FileRename(TypedDict, total=False):
+@dataclass
+class FileRename:
 	"""Represents information on a file/folder rename.
 
 	@since 3.16.0"""
@@ -1449,7 +1547,8 @@ class FileRename(TypedDict, total=False):
 	"""A file:// URI for the new location of the file/folder being renamed."""
 
 
-class RenameFilesParams(TypedDict, total=False):
+@dataclass
+class RenameFilesParams:
 	"""The parameters sent in notifications/requests for user-initiated renames of
 	files.
 
@@ -1459,7 +1558,8 @@ class RenameFilesParams(TypedDict, total=False):
 	the folder will be included, and not its children."""
 
 
-class FileDelete(TypedDict, total=False):
+@dataclass
+class FileDelete:
 	"""Represents information on a file/folder delete.
 
 	@since 3.16.0"""
@@ -1467,7 +1567,8 @@ class FileDelete(TypedDict, total=False):
 	"""A file:// URI for the location of the file/folder being deleted."""
 
 
-class DeleteFilesParams(TypedDict, total=False):
+@dataclass
+class DeleteFilesParams:
 	"""The parameters sent in notifications/requests for user-initiated deletes of
 	files.
 
@@ -1476,15 +1577,17 @@ class DeleteFilesParams(TypedDict, total=False):
 	"""An array of all files/folders deleted in this operation."""
 
 
+@dataclass
 class MonikerParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class Moniker(TypedDict, total=False):
+@dataclass
+class Moniker:
 	"""Moniker definition to match LSIF 0.5 moniker definition.
 
 	@since 3.16.0"""
@@ -1495,34 +1598,38 @@ class Moniker(TypedDict, total=False):
 	schema owners are allowed to define the structure if they want."""
 	unique: UniquenessLevel
 	"""The scope in which the moniker is unique"""
-	kind: NotRequired[MonikerKind]
+	kind: MonikerKind = optional_field()
 	"""The moniker kind if known."""
 
 
-class MonikerOptions(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class MonikerOptions:
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class MonikerRegistrationOptions(TextDocumentRegistrationOptions, MonikerOptions):
 	""""""
 
+@dataclass
 class TypeHierarchyPrepareParams(TextDocumentPositionParams):
 	"""The parameter of a `textDocument/prepareTypeHierarchy` request.
 
 	@since 3.17.0"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class TypeHierarchyItem(TypedDict, total=False):
+@dataclass
+class TypeHierarchyItem:
 	"""@since 3.17.0"""
 	name: str
 	"""The name of this item."""
 	kind: SymbolKind
 	"""The kind of this item."""
-	tags: NotRequired[List[SymbolTag]]
+	tags: List[SymbolTag] = optional_field()
 	"""Tags for this item."""
-	detail: NotRequired[str]
+	detail: str = optional_field()
 	"""More detail for this item, e.g. the signature of a function."""
 	uri: DocumentUri
 	"""The resource identifier of this item."""
@@ -1533,54 +1640,59 @@ class TypeHierarchyItem(TypedDict, total=False):
 	"""The range that should be selected and revealed when this symbol is being
 	picked, e.g. the name of a function. Must be contained by the
 	{@link TypeHierarchyItem.range `range`}."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved between a type hierarchy prepare and
 	supertypes or subtypes requests. It could also be used to identify the
 	type hierarchy in the server, helping improve the performance on
 	resolving supertypes and subtypes."""
 
 
-class TypeHierarchyOptions(TypedDict, total=False):
+@dataclass
+class TypeHierarchyOptions:
 	"""Type hierarchy options used during static registration.
 
 	@since 3.17.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class TypeHierarchyRegistrationOptions(TextDocumentRegistrationOptions, TypeHierarchyOptions):
 	"""Type hierarchy options used during static or dynamic registration.
 
 	@since 3.17.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class TypeHierarchySupertypesParams(TypedDict, total=False):
+@dataclass
+class TypeHierarchySupertypesParams:
 	"""The parameter of a `typeHierarchy/supertypes` request.
 
 	@since 3.17.0"""
 	item: TypeHierarchyItem
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class TypeHierarchySubtypesParams(TypedDict, total=False):
+@dataclass
+class TypeHierarchySubtypesParams:
 	"""The parameter of a `typeHierarchy/subtypes` request.
 
 	@since 3.17.0"""
 	item: TypeHierarchyItem
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class InlineValueContext(TypedDict, total=False):
+@dataclass
+class InlineValueContext:
 	"""@since 3.17.0"""
 	frameId: int
 	"""The stack frame (as a DAP Id) where the execution has stopped."""
@@ -1589,7 +1701,8 @@ class InlineValueContext(TypedDict, total=False):
 	Typically the end position of the range denotes the line where the inline values are shown."""
 
 
-class InlineValueParams(TypedDict, total=False):
+@dataclass
+class InlineValueParams:
 	"""A parameter literal used in inline value requests.
 
 	@since 3.17.0"""
@@ -1600,27 +1713,30 @@ class InlineValueParams(TypedDict, total=False):
 	context: InlineValueContext
 	"""Additional information about the context in which inline values were
 	requested."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class InlineValueOptions(TypedDict, total=False):
+@dataclass
+class InlineValueOptions:
 	"""Inline value options used during static registration.
 
 	@since 3.17.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class InlineValueRegistrationOptions(InlineValueOptions, TextDocumentRegistrationOptions):
 	"""Inline value options used during static or dynamic registration.
 
 	@since 3.17.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class InlayHintParams(TypedDict, total=False):
+@dataclass
+class InlayHintParams:
 	"""A parameter literal used in inlay hint requests.
 
 	@since 3.17.0"""
@@ -1628,11 +1744,12 @@ class InlayHintParams(TypedDict, total=False):
 	"""The text document."""
 	range: Range
 	"""The document range for which inlay hints should be computed."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class MarkupContent(TypedDict, total=False):
+@dataclass
+class MarkupContent:
 	r"""A `MarkupContent` literal represents a string value which content is interpreted base on its
 	kind flag. Currently the protocol supports `plaintext` and `markdown` as markup kinds.
 
@@ -1661,37 +1778,39 @@ class MarkupContent(TypedDict, total=False):
 	"""The content itself"""
 
 
-class Command(TypedDict, total=False):
+@dataclass
+class Command:
 	"""Represents a reference to a command. Provides a title which
 	will be used to represent a command in the UI and, optionally,
 	an array of arguments which will be passed to the command handler
 	function when invoked."""
 	title: str
 	"""Title of the command, like `save`."""
-	tooltip: NotRequired[str]
+	tooltip: str = optional_field()
 	"""An optional tooltip.
 
 	@since 3.18.0
 	@proposed"""
 	command: str
 	"""The identifier of the actual command handler."""
-	arguments: NotRequired[List[LSPAny]]
+	arguments: List[LSPAny] = optional_field()
 	"""Arguments that the command handler should be
 	invoked with."""
 
 
-class InlayHintLabelPart(TypedDict, total=False):
+@dataclass
+class InlayHintLabelPart:
 	"""An inlay hint label part allows for interactive and composite labels
 	of inlay hints.
 
 	@since 3.17.0"""
 	value: str
 	"""The value of this label part."""
-	tooltip: NotRequired[Union[str, MarkupContent]]
+	tooltip: Union[str, MarkupContent] = optional_field()
 	"""The tooltip text when you hover over this label part. Depending on
 	the client capability `inlayHint.resolveSupport` clients might resolve
 	this property late using the resolve request."""
-	location: NotRequired[Location]
+	location: Location = optional_field()
 	"""An optional source code location that represents this
 	label part.
 
@@ -1703,14 +1822,15 @@ class InlayHintLabelPart(TypedDict, total=False):
 
 	Depending on the client capability `inlayHint.resolveSupport` clients
 	might resolve this property late using the resolve request."""
-	command: NotRequired[Command]
+	command: Command = optional_field()
 	"""An optional command for this label part.
 
 	Depending on the client capability `inlayHint.resolveSupport` clients
 	might resolve this property late using the resolve request."""
 
 
-class InlayHint(TypedDict, total=False):
+@dataclass
+class InlayHint:
 	"""Inlay hint information.
 
 	@since 3.17.0"""
@@ -1724,71 +1844,75 @@ class InlayHint(TypedDict, total=False):
 	InlayHintLabelPart label parts.
 
 	*Note* that neither the string nor the label part can be empty."""
-	kind: NotRequired[InlayHintKind]
+	kind: InlayHintKind = optional_field()
 	"""The kind of this hint. Can be omitted in which case the client
 	should fall back to a reasonable default."""
-	textEdits: NotRequired[List[TextEdit]]
+	textEdits: List[TextEdit] = optional_field()
 	"""Optional text edits that are performed when accepting this inlay hint.
 
 	*Note* that edits are expected to change the document so that the inlay
 	hint (or its nearest variant) is now part of the document and the inlay
 	hint itself is now obsolete."""
-	tooltip: NotRequired[Union[str, MarkupContent]]
+	tooltip: Union[str, MarkupContent] = optional_field()
 	"""The tooltip text when you hover over this item."""
-	paddingLeft: NotRequired[bool]
+	paddingLeft: bool = optional_field()
 	"""Render padding before the hint.
 
 	Note: Padding should use the editor's background color, not the
 	background color of the hint itself. That means padding can be used
 	to visually align/separate an inlay hint."""
-	paddingRight: NotRequired[bool]
+	paddingRight: bool = optional_field()
 	"""Render padding after the hint.
 
 	Note: Padding should use the editor's background color, not the
 	background color of the hint itself. That means padding can be used
 	to visually align/separate an inlay hint."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on an inlay hint between
 	a `textDocument/inlayHint` and a `inlayHint/resolve` request."""
 
 
-class InlayHintOptions(TypedDict, total=False):
+@dataclass
+class InlayHintOptions:
 	"""Inlay hint options used during static registration.
 
 	@since 3.17.0"""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""The server provides support to resolve additional
 	information for an inlay hint item."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class InlayHintRegistrationOptions(InlayHintOptions, TextDocumentRegistrationOptions):
 	"""Inlay hint options used during static or dynamic registration.
 
 	@since 3.17.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class DocumentDiagnosticParams(TypedDict, total=False):
+@dataclass
+class DocumentDiagnosticParams:
 	"""Parameters of the document diagnostic request.
 
 	@since 3.17.0"""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
-	identifier: NotRequired[str]
+	identifier: str = optional_field()
 	"""The additional identifier  provided during registration."""
-	previousResultId: NotRequired[str]
+	previousResultId: str = optional_field()
 	"""The result id of a previous response if provided."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CodeDescription(TypedDict, total=False):
+@dataclass
+class CodeDescription:
 	"""Structure to capture a description for an error code.
 
 	@since 3.16.0"""
@@ -1796,7 +1920,8 @@ class CodeDescription(TypedDict, total=False):
 	"""An URI to open with more information about the diagnostic error."""
 
 
-class DiagnosticRelatedInformation(TypedDict, total=False):
+@dataclass
+class DiagnosticRelatedInformation:
 	"""Represents a related message and source code location for a diagnostic. This should be
 	used to point to code locations that cause or related to a diagnostics, e.g when duplicating
 	a symbol in a scope."""
@@ -1806,49 +1931,51 @@ class DiagnosticRelatedInformation(TypedDict, total=False):
 	"""The message of this related diagnostic information."""
 
 
-class Diagnostic(TypedDict, total=False):
+@dataclass
+class Diagnostic:
 	"""Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
 	are only valid in the scope of a resource."""
 	range: Range
 	"""The range at which the message applies"""
-	severity: NotRequired[DiagnosticSeverity]
+	severity: DiagnosticSeverity = optional_field()
 	"""The diagnostic's severity. To avoid interpretation mismatches when a
 	server is used with different clients it is highly recommended that servers
 	always provide a severity value."""
-	code: NotRequired[Union[int, str]]
+	code: Union[int, str] = optional_field()
 	"""The diagnostic's code, which usually appear in the user interface."""
-	codeDescription: NotRequired[CodeDescription]
+	codeDescription: CodeDescription = optional_field()
 	"""An optional property to describe the error code.
 	Requires the code field (above) to be present/not null.
 
 	@since 3.16.0"""
-	source: NotRequired[str]
+	source: str = optional_field()
 	"""A human-readable string describing the source of this
 	diagnostic, e.g. 'typescript' or 'super lint'. It usually
 	appears in the user interface."""
 	message: str
 	"""The diagnostic's message. It usually appears in the user interface"""
-	tags: NotRequired[List[DiagnosticTag]]
+	tags: List[DiagnosticTag] = optional_field()
 	"""Additional metadata about the diagnostic.
 
 	@since 3.15.0"""
-	relatedInformation: NotRequired[List[DiagnosticRelatedInformation]]
+	relatedInformation: List[DiagnosticRelatedInformation] = optional_field()
 	"""An array of related diagnostic information, e.g. when symbol-names within
 	a scope collide all definitions can be marked via this property."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved between a `textDocument/publishDiagnostics`
 	notification and `textDocument/codeAction` request.
 
 	@since 3.16.0"""
 
 
-class FullDocumentDiagnosticReport(TypedDict, total=False):
+@dataclass
+class FullDocumentDiagnosticReport:
 	"""A diagnostic report with a full set of problems.
 
 	@since 3.17.0"""
 	kind: Literal['full']
 	"""A full document diagnostic report."""
-	resultId: NotRequired[str]
+	resultId: str = optional_field()
 	"""An optional result id. If provided it will
 	be sent on the next diagnostic request for the
 	same document."""
@@ -1856,7 +1983,8 @@ class FullDocumentDiagnosticReport(TypedDict, total=False):
 	"""The actual items."""
 
 
-class UnchangedDocumentDiagnosticReport(TypedDict, total=False):
+@dataclass
+class UnchangedDocumentDiagnosticReport:
 	"""A diagnostic report indicating that the last returned
 	report is still accurate.
 
@@ -1871,25 +1999,28 @@ class UnchangedDocumentDiagnosticReport(TypedDict, total=False):
 	diagnostic request for the same document."""
 
 
-class DocumentDiagnosticReportPartialResult(TypedDict, total=False):
+@dataclass
+class DocumentDiagnosticReportPartialResult:
 	"""A partial result for a document diagnostic report.
 
 	@since 3.17.0"""
 	relatedDocuments: Dict[DocumentUri, Union[FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport]]
 
 
-class DiagnosticServerCancellationData(TypedDict, total=False):
+@dataclass
+class DiagnosticServerCancellationData:
 	"""Cancellation data returned from a diagnostic request.
 
 	@since 3.17.0"""
 	retriggerRequest: bool
 
 
-class DiagnosticOptions(TypedDict, total=False):
+@dataclass
+class DiagnosticOptions:
 	"""Diagnostic options.
 
 	@since 3.17.0"""
-	identifier: NotRequired[str]
+	identifier: str = optional_field()
 	"""An optional identifier under which the diagnostics are
 	managed by the client."""
 	interFileDependencies: bool
@@ -1899,19 +2030,21 @@ class DiagnosticOptions(TypedDict, total=False):
 	most programming languages and typically uncommon for linters."""
 	workspaceDiagnostics: bool
 	"""The server provides support for workspace diagnostics as well."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class DiagnosticRegistrationOptions(TextDocumentRegistrationOptions, DiagnosticOptions):
 	"""Diagnostic registration options.
 
 	@since 3.17.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class PreviousResultId(TypedDict, total=False):
+@dataclass
+class PreviousResultId:
 	"""A previous result id in a workspace pull request.
 
 	@since 3.17.0"""
@@ -1922,22 +2055,24 @@ class PreviousResultId(TypedDict, total=False):
 	"""The value of the previous result id."""
 
 
-class WorkspaceDiagnosticParams(TypedDict, total=False):
+@dataclass
+class WorkspaceDiagnosticParams:
 	"""Parameters of the workspace diagnostic request.
 
 	@since 3.17.0"""
-	identifier: NotRequired[str]
+	identifier: str = optional_field()
 	"""The additional identifier provided during registration."""
 	previousResultIds: List[PreviousResultId]
 	"""The currently known diagnostic reports with their
 	previous result ids."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
+@dataclass
 class WorkspaceFullDocumentDiagnosticReport(FullDocumentDiagnosticReport):
 	"""A full document diagnostic report for a workspace diagnostic result.
 
@@ -1949,6 +2084,7 @@ class WorkspaceFullDocumentDiagnosticReport(FullDocumentDiagnosticReport):
 	If the document is not marked as open `null` can be provided."""
 
 
+@dataclass
 class WorkspaceUnchangedDocumentDiagnosticReport(UnchangedDocumentDiagnosticReport):
 	"""An unchanged document diagnostic report for a workspace diagnostic result.
 
@@ -1965,31 +2101,35 @@ WorkspaceDocumentDiagnosticReport: TypeAlias = Union[WorkspaceFullDocumentDiagno
 
 @since 3.17.0"""
 
-class WorkspaceDiagnosticReport(TypedDict, total=False):
+@dataclass
+class WorkspaceDiagnosticReport:
 	"""A workspace diagnostic report.
 
 	@since 3.17.0"""
 	items: List[WorkspaceDocumentDiagnosticReport]
 
 
-class WorkspaceDiagnosticReportPartialResult(TypedDict, total=False):
+@dataclass
+class WorkspaceDiagnosticReportPartialResult:
 	"""A partial result for a workspace diagnostic report.
 
 	@since 3.17.0"""
 	items: List[WorkspaceDocumentDiagnosticReport]
 
 
-class ExecutionSummary(TypedDict, total=False):
+@dataclass
+class ExecutionSummary:
 	executionOrder: uinteger
 	"""A strict monotonically increasing value
 	indicating the execution order of a cell
 	inside a notebook."""
-	success: NotRequired[bool]
+	success: bool = optional_field()
 	"""Whether the execution was successful or
 	not if known by the client."""
 
 
-class NotebookCell(TypedDict, total=False):
+@dataclass
+class NotebookCell:
 	"""A notebook cell.
 
 	A cell's document URI must be unique across ALL notebook
@@ -2002,16 +2142,17 @@ class NotebookCell(TypedDict, total=False):
 	document: DocumentUri
 	"""The URI of the cell's text document
 	content."""
-	metadata: NotRequired[LSPObject]
+	metadata: LSPObject = optional_field()
 	"""Additional metadata stored with the cell.
 
 	Note: should always be an object literal (e.g. LSPObject)"""
-	executionSummary: NotRequired[ExecutionSummary]
+	executionSummary: ExecutionSummary = optional_field()
 	"""Additional execution summary information
 	if supported by the client."""
 
 
-class NotebookDocument(TypedDict, total=False):
+@dataclass
+class NotebookDocument:
 	"""A notebook document.
 
 	@since 3.17.0"""
@@ -2022,7 +2163,7 @@ class NotebookDocument(TypedDict, total=False):
 	version: int
 	"""The version number of this document (it will increase after each
 	change, including undo/redo)."""
-	metadata: NotRequired[LSPObject]
+	metadata: LSPObject = optional_field()
 	"""Additional metadata stored with the notebook
 	document.
 
@@ -2031,7 +2172,8 @@ class NotebookDocument(TypedDict, total=False):
 	"""The cells of a notebook."""
 
 
-class TextDocumentItem(TypedDict, total=False):
+@dataclass
+class TextDocumentItem:
 	"""An item to transfer a text document from the client to the
 	server."""
 	uri: DocumentUri
@@ -2045,7 +2187,8 @@ class TextDocumentItem(TypedDict, total=False):
 	"""The content of the opened text document."""
 
 
-class DidOpenNotebookDocumentParams(TypedDict, total=False):
+@dataclass
+class DidOpenNotebookDocumentParams:
 	"""The params sent in an open notebook document notification.
 
 	@since 3.17.0"""
@@ -2056,24 +2199,27 @@ class DidOpenNotebookDocumentParams(TypedDict, total=False):
 	of a notebook cell."""
 
 
-class NotebookCellLanguage(TypedDict, total=False):
+@dataclass
+class NotebookCellLanguage:
 	"""@since 3.18.0"""
 	language: str
 
 
-class NotebookDocumentFilterWithNotebook(TypedDict, total=False):
+@dataclass
+class NotebookDocumentFilterWithNotebook:
 	"""@since 3.18.0"""
 	notebook: Union[str, NotebookDocumentFilter]
 	"""The notebook to be synced If a string
 	value is provided it matches against the
 	notebook type. '*' matches every notebook."""
-	cells: NotRequired[List[NotebookCellLanguage]]
+	cells: List[NotebookCellLanguage] = optional_field()
 	"""The cells of the matching notebook to be synced."""
 
 
-class NotebookDocumentFilterWithCells(TypedDict, total=False):
+@dataclass
+class NotebookDocumentFilterWithCells:
 	"""@since 3.18.0"""
-	notebook: NotRequired[Union[str, NotebookDocumentFilter]]
+	notebook: Union[str, NotebookDocumentFilter] = optional_field()
 	"""The notebook to be synced If a string
 	value is provided it matches against the
 	notebook type. '*' matches every notebook."""
@@ -2081,7 +2227,8 @@ class NotebookDocumentFilterWithCells(TypedDict, total=False):
 	"""The cells of the matching notebook to be synced."""
 
 
-class NotebookDocumentSyncOptions(TypedDict, total=False):
+@dataclass
+class NotebookDocumentSyncOptions:
 	"""Options specific to a notebook plus its cells
 	to be synced to the server.
 
@@ -2097,21 +2244,23 @@ class NotebookDocumentSyncOptions(TypedDict, total=False):
 	@since 3.17.0"""
 	notebookSelector: List[Union[NotebookDocumentFilterWithNotebook, NotebookDocumentFilterWithCells]]
 	"""The notebooks to be synced"""
-	save: NotRequired[bool]
+	save: bool = optional_field()
 	"""Whether save notification should be forwarded to
 	the server. Will only be honored if mode === `notebook`."""
 
 
+@dataclass
 class NotebookDocumentSyncRegistrationOptions(NotebookDocumentSyncOptions):
 	"""Registration options specific to a notebook.
 
 	@since 3.17.0"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class VersionedNotebookDocumentIdentifier(TypedDict, total=False):
+@dataclass
+class VersionedNotebookDocumentIdentifier:
 	"""A versioned notebook document identifier.
 
 	@since 3.17.0"""
@@ -2121,7 +2270,8 @@ class VersionedNotebookDocumentIdentifier(TypedDict, total=False):
 	"""The notebook document's uri."""
 
 
-class NotebookCellArrayChange(TypedDict, total=False):
+@dataclass
+class NotebookCellArrayChange:
 	"""A change describing how to move a `NotebookCell`
 	array from state S to S'.
 
@@ -2130,33 +2280,36 @@ class NotebookCellArrayChange(TypedDict, total=False):
 	"""The start oftest of the cell that changed."""
 	deleteCount: uinteger
 	"""The deleted cells"""
-	cells: NotRequired[List[NotebookCell]]
+	cells: List[NotebookCell] = optional_field()
 	"""The new cells, if any"""
 
 
-class NotebookDocumentCellChangeStructure(TypedDict, total=False):
+@dataclass
+class NotebookDocumentCellChangeStructure:
 	"""Structural changes to cells in a notebook document.
 
 	@since 3.18.0"""
 	array: NotebookCellArrayChange
 	"""The change to the cell array."""
-	didOpen: NotRequired[List[TextDocumentItem]]
+	didOpen: List[TextDocumentItem] = optional_field()
 	"""Additional opened cell text documents."""
-	didClose: NotRequired[List[TextDocumentIdentifier]]
+	didClose: List[TextDocumentIdentifier] = optional_field()
 	"""Additional closed cell text documents."""
 
 
+@dataclass
 class VersionedTextDocumentIdentifier(TextDocumentIdentifier):
 	"""A text document identifier to denote a specific version of a text document."""
 	version: int
 	"""The version number of this document."""
 
 
-class TextDocumentContentChangePartial(TypedDict, total=False):
+@dataclass
+class TextDocumentContentChangePartial:
 	"""@since 3.18.0"""
 	range: Range
 	"""The range of the document that changed."""
-	rangeLength: NotRequired[uinteger]
+	rangeLength: uinteger = optional_field()
 	"""The optional length of the range that got replaced.
 
 	@deprecated use range instead."""
@@ -2164,7 +2317,8 @@ class TextDocumentContentChangePartial(TypedDict, total=False):
 	"""The new text for the provided range."""
 
 
-class TextDocumentContentChangeWholeDocument(TypedDict, total=False):
+@dataclass
+class TextDocumentContentChangeWholeDocument:
 	"""@since 3.18.0"""
 	text: str
 	"""The new text of the whole document."""
@@ -2174,7 +2328,8 @@ TextDocumentContentChangeEvent: TypeAlias = Union[TextDocumentContentChangeParti
 """An event describing a change to a text document. If only a text is provided
 it is considered to be the full content of the document."""
 
-class NotebookDocumentCellContentChanges(TypedDict, total=False):
+@dataclass
+class NotebookDocumentCellContentChanges:
 	"""Content changes to a cell in a notebook document.
 
 	@since 3.18.0"""
@@ -2182,33 +2337,36 @@ class NotebookDocumentCellContentChanges(TypedDict, total=False):
 	changes: List[TextDocumentContentChangeEvent]
 
 
-class NotebookDocumentCellChanges(TypedDict, total=False):
+@dataclass
+class NotebookDocumentCellChanges:
 	"""Cell changes to a notebook document.
 
 	@since 3.18.0"""
-	structure: NotRequired[NotebookDocumentCellChangeStructure]
+	structure: NotebookDocumentCellChangeStructure = optional_field()
 	"""Changes to the cell structure to add or
 	remove cells."""
-	data: NotRequired[List[NotebookCell]]
+	data: List[NotebookCell] = optional_field()
 	"""Changes to notebook cells properties like its
 	kind, execution summary or metadata."""
-	textContent: NotRequired[List[NotebookDocumentCellContentChanges]]
+	textContent: List[NotebookDocumentCellContentChanges] = optional_field()
 	"""Changes to the text content of notebook cells."""
 
 
-class NotebookDocumentChangeEvent(TypedDict, total=False):
+@dataclass
+class NotebookDocumentChangeEvent:
 	"""A change event for a notebook document.
 
 	@since 3.17.0"""
-	metadata: NotRequired[LSPObject]
+	metadata: LSPObject = optional_field()
 	"""The changed meta data if any.
 
 	Note: should always be an object literal (e.g. LSPObject)"""
-	cells: NotRequired[NotebookDocumentCellChanges]
+	cells: NotebookDocumentCellChanges = optional_field()
 	"""Changes to cells"""
 
 
-class DidChangeNotebookDocumentParams(TypedDict, total=False):
+@dataclass
+class DidChangeNotebookDocumentParams:
 	"""The params sent in a change notebook document notification.
 
 	@since 3.17.0"""
@@ -2233,7 +2391,8 @@ class DidChangeNotebookDocumentParams(TypedDict, total=False):
 	  you receive them."""
 
 
-class NotebookDocumentIdentifier(TypedDict, total=False):
+@dataclass
+class NotebookDocumentIdentifier:
 	"""A literal to identify a notebook document in the client.
 
 	@since 3.17.0"""
@@ -2241,7 +2400,8 @@ class NotebookDocumentIdentifier(TypedDict, total=False):
 	"""The notebook document's uri."""
 
 
-class DidSaveNotebookDocumentParams(TypedDict, total=False):
+@dataclass
+class DidSaveNotebookDocumentParams:
 	"""The params sent in a save notebook document notification.
 
 	@since 3.17.0"""
@@ -2249,7 +2409,8 @@ class DidSaveNotebookDocumentParams(TypedDict, total=False):
 	"""The notebook document that got saved."""
 
 
-class DidCloseNotebookDocumentParams(TypedDict, total=False):
+@dataclass
+class DidCloseNotebookDocumentParams:
 	"""The params sent in a close notebook document notification.
 
 	@since 3.17.0"""
@@ -2260,7 +2421,8 @@ class DidCloseNotebookDocumentParams(TypedDict, total=False):
 	of a notebook cell that got closed."""
 
 
-class SelectedCompletionInfo(TypedDict, total=False):
+@dataclass
+class SelectedCompletionInfo:
 	"""Describes the currently selected completion item.
 
 	@since 3.18.0
@@ -2271,17 +2433,19 @@ class SelectedCompletionInfo(TypedDict, total=False):
 	"""The text the range will be replaced with if this completion is accepted."""
 
 
-class InlineCompletionContext(TypedDict, total=False):
+@dataclass
+class InlineCompletionContext:
 	"""Provides information about the context in which an inline completion was requested.
 
 	@since 3.18.0
 	@proposed"""
 	triggerKind: InlineCompletionTriggerKind
 	"""Describes how the inline completion was triggered."""
-	selectedCompletionInfo: NotRequired[SelectedCompletionInfo]
+	selectedCompletionInfo: SelectedCompletionInfo = optional_field()
 	"""Provides information about the currently selected item in the autocomplete widget if it is visible."""
 
 
+@dataclass
 class InlineCompletionParams(TextDocumentPositionParams):
 	"""A parameter literal used in inline completion requests.
 
@@ -2290,26 +2454,28 @@ class InlineCompletionParams(TextDocumentPositionParams):
 	context: InlineCompletionContext
 	"""Additional information about the context in which inline completions were
 	requested."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class InlineCompletionItem(TypedDict, total=False):
+@dataclass
+class InlineCompletionItem:
 	"""An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
 
 	@since 3.18.0
 	@proposed"""
 	insertText: Union[str, StringValue]
 	"""The text to replace the range with. Must be set."""
-	filterText: NotRequired[str]
+	filterText: str = optional_field()
 	"""A text that is used to decide if this inline completion should be shown. When `falsy` the {@link InlineCompletionItem.insertText} is used."""
-	range: NotRequired[Range]
+	range: Range = optional_field()
 	"""The range to replace. Must begin and end on the same line."""
-	command: NotRequired[Command]
+	command: Command = optional_field()
 	"""An optional {@link Command} that is executed *after* inserting this completion."""
 
 
-class InlineCompletionList(TypedDict, total=False):
+@dataclass
+class InlineCompletionList:
 	"""Represents a collection of {@link InlineCompletionItem inline completion items} to be presented in the editor.
 
 	@since 3.18.0
@@ -2318,25 +2484,28 @@ class InlineCompletionList(TypedDict, total=False):
 	"""The inline completion items"""
 
 
-class InlineCompletionOptions(TypedDict, total=False):
+@dataclass
+class InlineCompletionOptions:
 	"""Inline completion options used during static registration.
 
 	@since 3.18.0
 	@proposed"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
+@dataclass
 class InlineCompletionRegistrationOptions(InlineCompletionOptions, TextDocumentRegistrationOptions):
 	"""Inline completion options used during static or dynamic registration.
 
 	@since 3.18.0
 	@proposed"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class TextDocumentContentParams(TypedDict, total=False):
+@dataclass
+class TextDocumentContentParams:
 	"""Parameters for the `workspace/textDocumentContent` request.
 
 	@since 3.18.0
@@ -2345,7 +2514,8 @@ class TextDocumentContentParams(TypedDict, total=False):
 	"""The uri of the text document."""
 
 
-class TextDocumentContentResult(TypedDict, total=False):
+@dataclass
+class TextDocumentContentResult:
 	"""Result of the `workspace/textDocumentContent` request.
 
 	@since 3.18.0
@@ -2357,7 +2527,8 @@ class TextDocumentContentResult(TypedDict, total=False):
 	normalizations done on the client"""
 
 
-class TextDocumentContentOptions(TypedDict, total=False):
+@dataclass
+class TextDocumentContentOptions:
 	"""Text document content provider options.
 
 	@since 3.18.0
@@ -2366,17 +2537,19 @@ class TextDocumentContentOptions(TypedDict, total=False):
 	"""The schemes for which the server provides content."""
 
 
+@dataclass
 class TextDocumentContentRegistrationOptions(TextDocumentContentOptions):
 	"""Text document content provider registration options.
 
 	@since 3.18.0
 	@proposed"""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class TextDocumentContentRefreshParams(TypedDict, total=False):
+@dataclass
+class TextDocumentContentRefreshParams:
 	"""Parameters for the `workspace/textDocumentContent/refresh` request.
 
 	@since 3.18.0
@@ -2385,22 +2558,25 @@ class TextDocumentContentRefreshParams(TypedDict, total=False):
 	"""The uri of the text document to refresh."""
 
 
-class Registration(TypedDict, total=False):
+@dataclass
+class Registration:
 	"""General parameters to register for a notification or to register a provider."""
 	id: str
 	"""The id used to register the request. The id can be used to deregister
 	the request again."""
 	method: str
 	"""The method / capability to register for."""
-	registerOptions: NotRequired[LSPAny]
+	registerOptions: LSPAny = optional_field()
 	"""Options necessary for the registration."""
 
 
-class RegistrationParams(TypedDict, total=False):
+@dataclass
+class RegistrationParams:
 	registrations: List[Registration]
 
 
-class Unregistration(TypedDict, total=False):
+@dataclass
+class Unregistration:
 	"""General parameters to unregister a request or notification."""
 	id: str
 	"""The id used to unregister the request or notification. Usually an id
@@ -2409,43 +2585,47 @@ class Unregistration(TypedDict, total=False):
 	"""The method to unregister for."""
 
 
-class UnregistrationParams(TypedDict, total=False):
+@dataclass
+class UnregistrationParams:
 	unregisterations: List[Unregistration]
 
 
-class ClientInfo(TypedDict, total=False):
+@dataclass
+class ClientInfo:
 	"""Information about the client
 
 	@since 3.15.0
 	@since 3.18.0 ClientInfo type name added."""
 	name: str
 	"""The name of the client as defined by the client."""
-	version: NotRequired[str]
+	version: str = optional_field()
 	"""The client's version as defined by the client."""
 
 
-class ChangeAnnotationsSupportOptions(TypedDict, total=False):
+@dataclass
+class ChangeAnnotationsSupportOptions:
 	"""@since 3.18.0"""
-	groupsOnLabel: NotRequired[bool]
+	groupsOnLabel: bool = optional_field()
 	"""Whether the client groups edits with equal labels into tree nodes,
 	for instance all edits labelled with "Changes in Strings" would
 	be a tree node."""
 
 
-class WorkspaceEditClientCapabilities(TypedDict, total=False):
-	documentChanges: NotRequired[bool]
+@dataclass
+class WorkspaceEditClientCapabilities:
+	documentChanges: bool = optional_field()
 	"""The client supports versioned document changes in `WorkspaceEdit`s"""
-	resourceOperations: NotRequired[List[ResourceOperationKind]]
+	resourceOperations: List[ResourceOperationKind] = optional_field()
 	"""The resource operations the client supports. Clients should at least
 	support 'create', 'rename' and 'delete' files and folders.
 
 	@since 3.13.0"""
-	failureHandling: NotRequired[FailureHandlingKind]
+	failureHandling: FailureHandlingKind = optional_field()
 	"""The failure handling strategy of a client if applying the workspace edit
 	fails.
 
 	@since 3.13.0"""
-	normalizesLineEndings: NotRequired[bool]
+	normalizesLineEndings: bool = optional_field()
 	"""Whether the client normalizes line endings to the client specific
 	setting.
 	If set to `true` the client will normalize line ending characters
@@ -2453,43 +2633,46 @@ class WorkspaceEditClientCapabilities(TypedDict, total=False):
 	character.
 
 	@since 3.16.0"""
-	changeAnnotationSupport: NotRequired[ChangeAnnotationsSupportOptions]
+	changeAnnotationSupport: ChangeAnnotationsSupportOptions = optional_field()
 	"""Whether the client in general supports change annotations on text edits,
 	create file, rename file and delete file changes.
 
 	@since 3.16.0"""
-	metadataSupport: NotRequired[bool]
+	metadataSupport: bool = optional_field()
 	"""Whether the client supports `WorkspaceEditMetadata` in `WorkspaceEdit`s.
 
 	@since 3.18.0
 	@proposed"""
-	snippetEditSupport: NotRequired[bool]
+	snippetEditSupport: bool = optional_field()
 	"""Whether the client supports snippets as text edits.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class DidChangeConfigurationClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class DidChangeConfigurationClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Did change configuration notification supports dynamic registration."""
 
 
-class DidChangeWatchedFilesClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class DidChangeWatchedFilesClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Did change watched files notification supports dynamic registration. Please note
 	that the current protocol doesn't support static configuration for file changes
 	from the server side."""
-	relativePatternSupport: NotRequired[bool]
+	relativePatternSupport: bool = optional_field()
 	"""Whether the client has support for {@link  RelativePattern relative pattern}
 	or not.
 
 	@since 3.17.0"""
 
 
-class ClientSymbolKindOptions(TypedDict, total=False):
+@dataclass
+class ClientSymbolKindOptions:
 	"""@since 3.18.0"""
-	valueSet: NotRequired[List[SymbolKind]]
+	valueSet: List[SymbolKind] = optional_field()
 	"""The symbol kind values the client supports. When this
 	property exists the client also guarantees that it will
 	handle values outside its set gracefully and falls back
@@ -2500,31 +2683,34 @@ class ClientSymbolKindOptions(TypedDict, total=False):
 	the initial version of the protocol."""
 
 
-class ClientSymbolTagOptions(TypedDict, total=False):
+@dataclass
+class ClientSymbolTagOptions:
 	"""@since 3.18.0"""
 	valueSet: List[SymbolTag]
 	"""The tags supported by the client."""
 
 
-class ClientSymbolResolveOptions(TypedDict, total=False):
+@dataclass
+class ClientSymbolResolveOptions:
 	"""@since 3.18.0"""
 	properties: List[str]
 	"""The properties that a client can resolve lazily. Usually
 	`location.range`"""
 
 
-class WorkspaceSymbolClientCapabilities(TypedDict, total=False):
+@dataclass
+class WorkspaceSymbolClientCapabilities:
 	"""Client capabilities for a {@link WorkspaceSymbolRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Symbol request supports dynamic registration."""
-	symbolKind: NotRequired[ClientSymbolKindOptions]
+	symbolKind: ClientSymbolKindOptions = optional_field()
 	"""Specific capabilities for the `SymbolKind` in the `workspace/symbol` request."""
-	tagSupport: NotRequired[ClientSymbolTagOptions]
+	tagSupport: ClientSymbolTagOptions = optional_field()
 	"""The client supports tags on `SymbolInformation`.
 	Clients supporting tags have to handle unknown tags gracefully.
 
 	@since 3.16.0"""
-	resolveSupport: NotRequired[ClientSymbolResolveOptions]
+	resolveSupport: ClientSymbolResolveOptions = optional_field()
 	"""The client support partial workspace symbols. The client will send the
 	request `workspaceSymbol/resolve` to the server to resolve additional
 	properties.
@@ -2532,15 +2718,17 @@ class WorkspaceSymbolClientCapabilities(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class ExecuteCommandClientCapabilities(TypedDict, total=False):
+@dataclass
+class ExecuteCommandClientCapabilities:
 	"""The client capabilities of a {@link ExecuteCommandRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Execute command supports dynamic registration."""
 
 
-class SemanticTokensWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class SemanticTokensWorkspaceClientCapabilities:
 	"""@since 3.16.0"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from
 	the server to the client.
 
@@ -2550,9 +2738,10 @@ class SemanticTokensWorkspaceClientCapabilities(TypedDict, total=False):
 	wide change that requires such a calculation."""
 
 
-class CodeLensWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class CodeLensWorkspaceClientCapabilities:
 	"""@since 3.16.0"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from the
 	server to the client.
 
@@ -2562,34 +2751,36 @@ class CodeLensWorkspaceClientCapabilities(TypedDict, total=False):
 	change that requires such a calculation."""
 
 
-class FileOperationClientCapabilities(TypedDict, total=False):
+@dataclass
+class FileOperationClientCapabilities:
 	"""Capabilities relating to events from file operations by the user in the client.
 
 	These events do not come from the file system, they come from user operations
 	like renaming a file in the UI.
 
 	@since 3.16.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether the client supports dynamic registration for file requests/notifications."""
-	didCreate: NotRequired[bool]
+	didCreate: bool = optional_field()
 	"""The client has support for sending didCreateFiles notifications."""
-	willCreate: NotRequired[bool]
+	willCreate: bool = optional_field()
 	"""The client has support for sending willCreateFiles requests."""
-	didRename: NotRequired[bool]
+	didRename: bool = optional_field()
 	"""The client has support for sending didRenameFiles notifications."""
-	willRename: NotRequired[bool]
+	willRename: bool = optional_field()
 	"""The client has support for sending willRenameFiles requests."""
-	didDelete: NotRequired[bool]
+	didDelete: bool = optional_field()
 	"""The client has support for sending didDeleteFiles notifications."""
-	willDelete: NotRequired[bool]
+	willDelete: bool = optional_field()
 	"""The client has support for sending willDeleteFiles requests."""
 
 
-class InlineValueWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class InlineValueWorkspaceClientCapabilities:
 	"""Client workspace capabilities specific to inline values.
 
 	@since 3.17.0"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from the
 	server to the client.
 
@@ -2599,11 +2790,12 @@ class InlineValueWorkspaceClientCapabilities(TypedDict, total=False):
 	change that requires such a calculation."""
 
 
-class InlayHintWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class InlayHintWorkspaceClientCapabilities:
 	"""Client workspace capabilities specific to inlay hints.
 
 	@since 3.17.0"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from
 	the server to the client.
 
@@ -2613,11 +2805,12 @@ class InlayHintWorkspaceClientCapabilities(TypedDict, total=False):
 	change that requires such a calculation."""
 
 
-class DiagnosticWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class DiagnosticWorkspaceClientCapabilities:
 	"""Workspace client capabilities specific to diagnostic pull requests.
 
 	@since 3.17.0"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from
 	the server to the client.
 
@@ -2627,12 +2820,13 @@ class DiagnosticWorkspaceClientCapabilities(TypedDict, total=False):
 	change that requires such a calculation."""
 
 
-class FoldingRangeWorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class FoldingRangeWorkspaceClientCapabilities:
 	"""Client workspace capabilities specific to folding ranges
 
 	@since 3.18.0
 	@proposed"""
-	refreshSupport: NotRequired[bool]
+	refreshSupport: bool = optional_field()
 	"""Whether the client implementation supports a refresh request sent from the
 	server to the client.
 
@@ -2645,169 +2839,178 @@ class FoldingRangeWorkspaceClientCapabilities(TypedDict, total=False):
 	@proposed"""
 
 
-class TextDocumentContentClientCapabilities(TypedDict, total=False):
+@dataclass
+class TextDocumentContentClientCapabilities:
 	"""Client capabilities for a text document content provider.
 
 	@since 3.18.0
 	@proposed"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Text document content provider supports dynamic registration."""
 
 
-class WorkspaceClientCapabilities(TypedDict, total=False):
+@dataclass
+class WorkspaceClientCapabilities:
 	"""Workspace specific client capabilities."""
-	applyEdit: NotRequired[bool]
+	applyEdit: bool = optional_field()
 	"""The client supports applying batch edits
 	to the workspace by supporting the request
 	'workspace/applyEdit'"""
-	workspaceEdit: NotRequired[WorkspaceEditClientCapabilities]
+	workspaceEdit: WorkspaceEditClientCapabilities = optional_field()
 	"""Capabilities specific to `WorkspaceEdit`s."""
-	didChangeConfiguration: NotRequired[DidChangeConfigurationClientCapabilities]
+	didChangeConfiguration: DidChangeConfigurationClientCapabilities = optional_field()
 	"""Capabilities specific to the `workspace/didChangeConfiguration` notification."""
-	didChangeWatchedFiles: NotRequired[DidChangeWatchedFilesClientCapabilities]
+	didChangeWatchedFiles: DidChangeWatchedFilesClientCapabilities = optional_field()
 	"""Capabilities specific to the `workspace/didChangeWatchedFiles` notification."""
-	symbol: NotRequired[WorkspaceSymbolClientCapabilities]
+	symbol: WorkspaceSymbolClientCapabilities = optional_field()
 	"""Capabilities specific to the `workspace/symbol` request."""
-	executeCommand: NotRequired[ExecuteCommandClientCapabilities]
+	executeCommand: ExecuteCommandClientCapabilities = optional_field()
 	"""Capabilities specific to the `workspace/executeCommand` request."""
-	workspaceFolders: NotRequired[bool]
+	workspaceFolders: bool = optional_field()
 	"""The client has support for workspace folders.
 
 	@since 3.6.0"""
-	configuration: NotRequired[bool]
+	configuration: bool = optional_field()
 	"""The client supports `workspace/configuration` requests.
 
 	@since 3.6.0"""
-	semanticTokens: NotRequired[SemanticTokensWorkspaceClientCapabilities]
+	semanticTokens: SemanticTokensWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the semantic token requests scoped to the
 	workspace.
 
 	@since 3.16.0."""
-	codeLens: NotRequired[CodeLensWorkspaceClientCapabilities]
+	codeLens: CodeLensWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the code lens requests scoped to the
 	workspace.
 
 	@since 3.16.0."""
-	fileOperations: NotRequired[FileOperationClientCapabilities]
+	fileOperations: FileOperationClientCapabilities = optional_field()
 	"""The client has support for file notifications/requests for user operations on files.
 
 	Since 3.16.0"""
-	inlineValue: NotRequired[InlineValueWorkspaceClientCapabilities]
+	inlineValue: InlineValueWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the inline values requests scoped to the
 	workspace.
 
 	@since 3.17.0."""
-	inlayHint: NotRequired[InlayHintWorkspaceClientCapabilities]
+	inlayHint: InlayHintWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the inlay hint requests scoped to the
 	workspace.
 
 	@since 3.17.0."""
-	diagnostics: NotRequired[DiagnosticWorkspaceClientCapabilities]
+	diagnostics: DiagnosticWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the diagnostic requests scoped to the
 	workspace.
 
 	@since 3.17.0."""
-	foldingRange: NotRequired[FoldingRangeWorkspaceClientCapabilities]
+	foldingRange: FoldingRangeWorkspaceClientCapabilities = optional_field()
 	"""Capabilities specific to the folding range requests scoped to the workspace.
 
 	@since 3.18.0
 	@proposed"""
-	textDocumentContent: NotRequired[TextDocumentContentClientCapabilities]
+	textDocumentContent: TextDocumentContentClientCapabilities = optional_field()
 	"""Capabilities specific to the `workspace/textDocumentContent` request.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class TextDocumentSyncClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class TextDocumentSyncClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether text document synchronization supports dynamic registration."""
-	willSave: NotRequired[bool]
+	willSave: bool = optional_field()
 	"""The client supports sending will save notifications."""
-	willSaveWaitUntil: NotRequired[bool]
+	willSaveWaitUntil: bool = optional_field()
 	"""The client supports sending a will save request and
 	waits for a response providing text edits which will
 	be applied to the document before it is saved."""
-	didSave: NotRequired[bool]
+	didSave: bool = optional_field()
 	"""The client supports did save notifications."""
 
 
-class TextDocumentFilterClientCapabilities(TypedDict, total=False):
-	relativePatternSupport: NotRequired[bool]
+@dataclass
+class TextDocumentFilterClientCapabilities:
+	relativePatternSupport: bool = optional_field()
 	"""The client supports Relative Patterns.
 
 	@since 3.18.0"""
 
 
-class CompletionItemTagOptions(TypedDict, total=False):
+@dataclass
+class CompletionItemTagOptions:
 	"""@since 3.18.0"""
 	valueSet: List[CompletionItemTag]
 	"""The tags supported by the client."""
 
 
-class ClientCompletionItemResolveOptions(TypedDict, total=False):
+@dataclass
+class ClientCompletionItemResolveOptions:
 	"""@since 3.18.0"""
 	properties: List[str]
 	"""The properties that a client can resolve lazily."""
 
 
-class ClientCompletionItemInsertTextModeOptions(TypedDict, total=False):
+@dataclass
+class ClientCompletionItemInsertTextModeOptions:
 	"""@since 3.18.0"""
 	valueSet: List[InsertTextMode]
 
 
-class ClientCompletionItemOptions(TypedDict, total=False):
+@dataclass
+class ClientCompletionItemOptions:
 	"""@since 3.18.0"""
-	snippetSupport: NotRequired[bool]
+	snippetSupport: bool = optional_field()
 	"""Client supports snippets as insert text.
 
 	A snippet can define tab stops and placeholders with `$1`, `$2`
 	and `${3:foo}`. `$0` defines the final tab stop, it defaults to
 	the end of the snippet. Placeholders with equal identifiers are linked,
 	that is typing in one will update others too."""
-	commitCharactersSupport: NotRequired[bool]
+	commitCharactersSupport: bool = optional_field()
 	"""Client supports commit characters on a completion item."""
-	documentationFormat: NotRequired[List[MarkupKind]]
+	documentationFormat: List[MarkupKind] = optional_field()
 	"""Client supports the following content formats for the documentation
 	property. The order describes the preferred format of the client."""
-	deprecatedSupport: NotRequired[bool]
+	deprecatedSupport: bool = optional_field()
 	"""Client supports the deprecated property on a completion item."""
-	preselectSupport: NotRequired[bool]
+	preselectSupport: bool = optional_field()
 	"""Client supports the preselect property on a completion item."""
-	tagSupport: NotRequired[CompletionItemTagOptions]
+	tagSupport: CompletionItemTagOptions = optional_field()
 	"""Client supports the tag property on a completion item. Clients supporting
 	tags have to handle unknown tags gracefully. Clients especially need to
 	preserve unknown tags when sending a completion item back to the server in
 	a resolve call.
 
 	@since 3.15.0"""
-	insertReplaceSupport: NotRequired[bool]
+	insertReplaceSupport: bool = optional_field()
 	"""Client support insert replace edit to control different behavior if a
 	completion item is inserted in the text or should replace text.
 
 	@since 3.16.0"""
-	resolveSupport: NotRequired[ClientCompletionItemResolveOptions]
+	resolveSupport: ClientCompletionItemResolveOptions = optional_field()
 	"""Indicates which properties a client can resolve lazily on a completion
 	item. Before version 3.16.0 only the predefined properties `documentation`
 	and `details` could be resolved lazily.
 
 	@since 3.16.0"""
-	insertTextModeSupport: NotRequired[ClientCompletionItemInsertTextModeOptions]
+	insertTextModeSupport: ClientCompletionItemInsertTextModeOptions = optional_field()
 	"""The client supports the `insertTextMode` property on
 	a completion item to override the whitespace handling mode
 	as defined by the client (see `insertTextMode`).
 
 	@since 3.16.0"""
-	labelDetailsSupport: NotRequired[bool]
+	labelDetailsSupport: bool = optional_field()
 	"""The client has support for completion item label
 	details (see also `CompletionItemLabelDetails`).
 
 	@since 3.17.0"""
 
 
-class ClientCompletionItemOptionsKind(TypedDict, total=False):
+@dataclass
+class ClientCompletionItemOptionsKind:
 	"""@since 3.18.0"""
-	valueSet: NotRequired[List[CompletionItemKind]]
+	valueSet: List[CompletionItemKind] = optional_field()
 	"""The completion item kind values the client supports. When this
 	property exists the client also guarantees that it will
 	handle values outside its set gracefully and falls back
@@ -2818,12 +3021,13 @@ class ClientCompletionItemOptionsKind(TypedDict, total=False):
 	the initial version of the protocol."""
 
 
-class CompletionListCapabilities(TypedDict, total=False):
+@dataclass
+class CompletionListCapabilities:
 	"""The client supports the following `CompletionList` specific
 	capabilities.
 
 	@since 3.17.0"""
-	itemDefaults: NotRequired[List[str]]
+	itemDefaults: List[str] = optional_field()
 	"""The client supports the following itemDefaults on
 	a completion list.
 
@@ -2832,7 +3036,7 @@ class CompletionListCapabilities(TypedDict, total=False):
 	no properties are supported.
 
 	@since 3.17.0"""
-	applyKindSupport: NotRequired[bool]
+	applyKindSupport: bool = optional_field()
 	"""Specifies whether the client supports `CompletionList.applyKind` to
 	indicate how supported values from `completionList.itemDefaults`
 	and `completion` will be combined.
@@ -2846,60 +3050,64 @@ class CompletionListCapabilities(TypedDict, total=False):
 	@since 3.18.0"""
 
 
-class CompletionClientCapabilities(TypedDict, total=False):
+@dataclass
+class CompletionClientCapabilities:
 	"""Completion client capabilities"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether completion supports dynamic registration."""
-	completionItem: NotRequired[ClientCompletionItemOptions]
+	completionItem: ClientCompletionItemOptions = optional_field()
 	"""The client supports the following `CompletionItem` specific
 	capabilities."""
-	completionItemKind: NotRequired[ClientCompletionItemOptionsKind]
-	insertTextMode: NotRequired[InsertTextMode]
+	completionItemKind: ClientCompletionItemOptionsKind = optional_field()
+	insertTextMode: InsertTextMode = optional_field()
 	"""Defines how the client handles whitespace and indentation
 	when accepting a completion item that uses multi line
 	text in either `insertText` or `textEdit`.
 
 	@since 3.17.0"""
-	contextSupport: NotRequired[bool]
+	contextSupport: bool = optional_field()
 	"""The client supports to send additional context information for a
 	`textDocument/completion` request."""
-	completionList: NotRequired[CompletionListCapabilities]
+	completionList: CompletionListCapabilities = optional_field()
 	"""The client supports the following `CompletionList` specific
 	capabilities.
 
 	@since 3.17.0"""
 
 
-class HoverClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class HoverClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether hover supports dynamic registration."""
-	contentFormat: NotRequired[List[MarkupKind]]
+	contentFormat: List[MarkupKind] = optional_field()
 	"""Client supports the following content formats for the content
 	property. The order describes the preferred format of the client."""
 
 
-class ClientSignatureParameterInformationOptions(TypedDict, total=False):
+@dataclass
+class ClientSignatureParameterInformationOptions:
 	"""@since 3.18.0"""
-	labelOffsetSupport: NotRequired[bool]
+	labelOffsetSupport: bool = optional_field()
 	"""The client supports processing label offsets instead of a
 	simple label string.
 
 	@since 3.14.0"""
 
 
-class ClientSignatureInformationOptions(TypedDict, total=False):
+@dataclass
+class ClientSignatureInformationOptions:
 	"""@since 3.18.0"""
-	documentationFormat: NotRequired[List[MarkupKind]]
+	documentationFormat: List[MarkupKind] = optional_field()
 	"""Client supports the following content formats for the documentation
 	property. The order describes the preferred format of the client."""
-	parameterInformation: NotRequired[ClientSignatureParameterInformationOptions]
+	parameterInformation: ClientSignatureParameterInformationOptions = optional_field()
 	"""Client capabilities specific to parameter information."""
-	activeParameterSupport: NotRequired[bool]
+	activeParameterSupport: bool = optional_field()
 	"""The client supports the `activeParameter` property on `SignatureInformation`
 	literal.
 
 	@since 3.16.0"""
-	noActiveParameterSupport: NotRequired[bool]
+	noActiveParameterSupport: bool = optional_field()
 	"""The client supports the `activeParameter` property on
 	`SignatureHelp`/`SignatureInformation` being set to `null` to
 	indicate that no parameter should be active.
@@ -2908,14 +3116,15 @@ class ClientSignatureInformationOptions(TypedDict, total=False):
 	@proposed"""
 
 
-class SignatureHelpClientCapabilities(TypedDict, total=False):
+@dataclass
+class SignatureHelpClientCapabilities:
 	"""Client Capabilities for a {@link SignatureHelpRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether signature help supports dynamic registration."""
-	signatureInformation: NotRequired[ClientSignatureInformationOptions]
+	signatureInformation: ClientSignatureInformationOptions = optional_field()
 	"""The client supports the following `SignatureInformation`
 	specific properties."""
-	contextSupport: NotRequired[bool]
+	contextSupport: bool = optional_field()
 	"""The client supports to send additional context information for a
 	`textDocument/signatureHelp` request. A client that opts into
 	contextSupport will also support the `retriggerCharacters` on
@@ -2924,85 +3133,93 @@ class SignatureHelpClientCapabilities(TypedDict, total=False):
 	@since 3.15.0"""
 
 
-class DeclarationClientCapabilities(TypedDict, total=False):
+@dataclass
+class DeclarationClientCapabilities:
 	"""@since 3.14.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether declaration supports dynamic registration. If this is set to `true`
 	the client supports the new `DeclarationRegistrationOptions` return value
 	for the corresponding server capability as well."""
-	linkSupport: NotRequired[bool]
+	linkSupport: bool = optional_field()
 	"""The client supports additional metadata in the form of declaration links."""
 
 
-class DefinitionClientCapabilities(TypedDict, total=False):
+@dataclass
+class DefinitionClientCapabilities:
 	"""Client Capabilities for a {@link DefinitionRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether definition supports dynamic registration."""
-	linkSupport: NotRequired[bool]
+	linkSupport: bool = optional_field()
 	"""The client supports additional metadata in the form of definition links.
 
 	@since 3.14.0"""
 
 
-class TypeDefinitionClientCapabilities(TypedDict, total=False):
+@dataclass
+class TypeDefinitionClientCapabilities:
 	"""Since 3.6.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `TypeDefinitionRegistrationOptions` return value
 	for the corresponding server capability as well."""
-	linkSupport: NotRequired[bool]
+	linkSupport: bool = optional_field()
 	"""The client supports additional metadata in the form of definition links.
 
 	Since 3.14.0"""
 
 
-class ImplementationClientCapabilities(TypedDict, total=False):
+@dataclass
+class ImplementationClientCapabilities:
 	"""@since 3.6.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `ImplementationRegistrationOptions` return value
 	for the corresponding server capability as well."""
-	linkSupport: NotRequired[bool]
+	linkSupport: bool = optional_field()
 	"""The client supports additional metadata in the form of definition links.
 
 	@since 3.14.0"""
 
 
-class ReferenceClientCapabilities(TypedDict, total=False):
+@dataclass
+class ReferenceClientCapabilities:
 	"""Client Capabilities for a {@link ReferencesRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether references supports dynamic registration."""
 
 
-class DocumentHighlightClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentHighlightClientCapabilities:
 	"""Client Capabilities for a {@link DocumentHighlightRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether document highlight supports dynamic registration."""
 
 
-class DocumentSymbolClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentSymbolClientCapabilities:
 	"""Client Capabilities for a {@link DocumentSymbolRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether document symbol supports dynamic registration."""
-	symbolKind: NotRequired[ClientSymbolKindOptions]
+	symbolKind: ClientSymbolKindOptions = optional_field()
 	"""Specific capabilities for the `SymbolKind` in the
 	`textDocument/documentSymbol` request."""
-	hierarchicalDocumentSymbolSupport: NotRequired[bool]
+	hierarchicalDocumentSymbolSupport: bool = optional_field()
 	"""The client supports hierarchical document symbols."""
-	tagSupport: NotRequired[ClientSymbolTagOptions]
+	tagSupport: ClientSymbolTagOptions = optional_field()
 	"""The client supports tags on `SymbolInformation`. Tags are supported on
 	`DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.
 	Clients supporting tags have to handle unknown tags gracefully.
 
 	@since 3.16.0"""
-	labelSupport: NotRequired[bool]
+	labelSupport: bool = optional_field()
 	"""The client supports an additional label presented in the UI when
 	registering a document symbol provider.
 
 	@since 3.16.0"""
 
 
-class ClientCodeActionKindOptions(TypedDict, total=False):
+@dataclass
+class ClientCodeActionKindOptions:
 	"""@since 3.18.0"""
 	valueSet: List[CodeActionKind]
 	"""The code action kind values the client supports. When this
@@ -3011,55 +3228,59 @@ class ClientCodeActionKindOptions(TypedDict, total=False):
 	to a default value when unknown."""
 
 
-class ClientCodeActionLiteralOptions(TypedDict, total=False):
+@dataclass
+class ClientCodeActionLiteralOptions:
 	"""@since 3.18.0"""
 	codeActionKind: ClientCodeActionKindOptions
 	"""The code action kind is support with the following value
 	set."""
 
 
-class ClientCodeActionResolveOptions(TypedDict, total=False):
+@dataclass
+class ClientCodeActionResolveOptions:
 	"""@since 3.18.0"""
 	properties: List[str]
 	"""The properties that a client can resolve lazily."""
 
 
-class CodeActionTagOptions(TypedDict, total=False):
+@dataclass
+class CodeActionTagOptions:
 	"""@since 3.18.0 - proposed"""
 	valueSet: List[CodeActionTag]
 	"""The tags supported by the client."""
 
 
-class CodeActionClientCapabilities(TypedDict, total=False):
+@dataclass
+class CodeActionClientCapabilities:
 	"""The Client Capabilities of a {@link CodeActionRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether code action supports dynamic registration."""
-	codeActionLiteralSupport: NotRequired[ClientCodeActionLiteralOptions]
+	codeActionLiteralSupport: ClientCodeActionLiteralOptions = optional_field()
 	"""The client support code action literals of type `CodeAction` as a valid
 	response of the `textDocument/codeAction` request. If the property is not
 	set the request can only return `Command` literals.
 
 	@since 3.8.0"""
-	isPreferredSupport: NotRequired[bool]
+	isPreferredSupport: bool = optional_field()
 	"""Whether code action supports the `isPreferred` property.
 
 	@since 3.15.0"""
-	disabledSupport: NotRequired[bool]
+	disabledSupport: bool = optional_field()
 	"""Whether code action supports the `disabled` property.
 
 	@since 3.16.0"""
-	dataSupport: NotRequired[bool]
+	dataSupport: bool = optional_field()
 	"""Whether code action supports the `data` property which is
 	preserved between a `textDocument/codeAction` and a
 	`codeAction/resolve` request.
 
 	@since 3.16.0"""
-	resolveSupport: NotRequired[ClientCodeActionResolveOptions]
+	resolveSupport: ClientCodeActionResolveOptions = optional_field()
 	"""Whether the client supports resolving additional code action
 	properties via a separate `codeAction/resolve` request.
 
 	@since 3.16.0"""
-	honorsChangeAnnotations: NotRequired[bool]
+	honorsChangeAnnotations: bool = optional_field()
 	"""Whether the client honors the change annotations in
 	text edits and resource operations returned via the
 	`CodeAction#edit` property by for example presenting
@@ -3067,92 +3288,100 @@ class CodeActionClientCapabilities(TypedDict, total=False):
 	for confirmation.
 
 	@since 3.16.0"""
-	documentationSupport: NotRequired[bool]
+	documentationSupport: bool = optional_field()
 	"""Whether the client supports documentation for a class of
 	code actions.
 
 	@since 3.18.0
 	@proposed"""
-	tagSupport: NotRequired[CodeActionTagOptions]
+	tagSupport: CodeActionTagOptions = optional_field()
 	"""Client supports the tag property on a code action. Clients
 	supporting tags have to handle unknown tags gracefully.
 
 	@since 3.18.0 - proposed"""
 
 
-class ClientCodeLensResolveOptions(TypedDict, total=False):
+@dataclass
+class ClientCodeLensResolveOptions:
 	"""@since 3.18.0"""
 	properties: List[str]
 	"""The properties that a client can resolve lazily."""
 
 
-class CodeLensClientCapabilities(TypedDict, total=False):
+@dataclass
+class CodeLensClientCapabilities:
 	"""The client capabilities  of a {@link CodeLensRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether code lens supports dynamic registration."""
-	resolveSupport: NotRequired[ClientCodeLensResolveOptions]
+	resolveSupport: ClientCodeLensResolveOptions = optional_field()
 	"""Whether the client supports resolving additional code lens
 	properties via a separate `codeLens/resolve` request.
 
 	@since 3.18.0"""
 
 
-class DocumentLinkClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentLinkClientCapabilities:
 	"""The client capabilities of a {@link DocumentLinkRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether document link supports dynamic registration."""
-	tooltipSupport: NotRequired[bool]
+	tooltipSupport: bool = optional_field()
 	"""Whether the client supports the `tooltip` property on `DocumentLink`.
 
 	@since 3.15.0"""
 
 
-class DocumentColorClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class DocumentColorClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `DocumentColorRegistrationOptions` return value
 	for the corresponding server capability as well."""
 
 
-class DocumentFormattingClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentFormattingClientCapabilities:
 	"""Client capabilities of a {@link DocumentFormattingRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether formatting supports dynamic registration."""
 
 
-class DocumentRangeFormattingClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentRangeFormattingClientCapabilities:
 	"""Client capabilities of a {@link DocumentRangeFormattingRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether range formatting supports dynamic registration."""
-	rangesSupport: NotRequired[bool]
+	rangesSupport: bool = optional_field()
 	"""Whether the client supports formatting multiple ranges at once.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class DocumentOnTypeFormattingClientCapabilities(TypedDict, total=False):
+@dataclass
+class DocumentOnTypeFormattingClientCapabilities:
 	"""Client capabilities of a {@link DocumentOnTypeFormattingRequest}."""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether on type formatting supports dynamic registration."""
 
 
-class RenameClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class RenameClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether rename supports dynamic registration."""
-	prepareSupport: NotRequired[bool]
+	prepareSupport: bool = optional_field()
 	"""Client supports testing for validity of rename operations
 	before execution.
 
 	@since 3.12.0"""
-	prepareSupportDefaultBehavior: NotRequired[PrepareSupportDefaultBehavior]
+	prepareSupportDefaultBehavior: PrepareSupportDefaultBehavior = optional_field()
 	"""Client supports the default behavior result.
 
 	The value indicates the default behavior used by the
 	client.
 
 	@since 3.16.0"""
-	honorsChangeAnnotations: NotRequired[bool]
+	honorsChangeAnnotations: bool = optional_field()
 	"""Whether the client honors the change annotations in
 	text edits and resource operations returned via the
 	rename request's workspace edit by for example presenting
@@ -3162,75 +3391,81 @@ class RenameClientCapabilities(TypedDict, total=False):
 	@since 3.16.0"""
 
 
-class ClientFoldingRangeKindOptions(TypedDict, total=False):
+@dataclass
+class ClientFoldingRangeKindOptions:
 	"""@since 3.18.0"""
-	valueSet: NotRequired[List[FoldingRangeKind]]
+	valueSet: List[FoldingRangeKind] = optional_field()
 	"""The folding range kind values the client supports. When this
 	property exists the client also guarantees that it will
 	handle values outside its set gracefully and falls back
 	to a default value when unknown."""
 
 
-class ClientFoldingRangeOptions(TypedDict, total=False):
+@dataclass
+class ClientFoldingRangeOptions:
 	"""@since 3.18.0"""
-	collapsedText: NotRequired[bool]
+	collapsedText: bool = optional_field()
 	"""If set, the client signals that it supports setting collapsedText on
 	folding ranges to display custom labels instead of the default text.
 
 	@since 3.17.0"""
 
 
-class FoldingRangeClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class FoldingRangeClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration for folding range
 	providers. If this is set to `true` the client supports the new
 	`FoldingRangeRegistrationOptions` return value for the corresponding
 	server capability as well."""
-	rangeLimit: NotRequired[uinteger]
+	rangeLimit: uinteger = optional_field()
 	"""The maximum number of folding ranges that the client prefers to receive
 	per document. The value serves as a hint, servers are free to follow the
 	limit."""
-	lineFoldingOnly: NotRequired[bool]
+	lineFoldingOnly: bool = optional_field()
 	"""If set, the client signals that it only supports folding complete lines.
 	If set, client will ignore specified `startCharacter` and `endCharacter`
 	properties in a FoldingRange."""
-	foldingRangeKind: NotRequired[ClientFoldingRangeKindOptions]
+	foldingRangeKind: ClientFoldingRangeKindOptions = optional_field()
 	"""Specific options for the folding range kind.
 
 	@since 3.17.0"""
-	foldingRange: NotRequired[ClientFoldingRangeOptions]
+	foldingRange: ClientFoldingRangeOptions = optional_field()
 	"""Specific options for the folding range.
 
 	@since 3.17.0"""
 
 
-class SelectionRangeClientCapabilities(TypedDict, total=False):
-	dynamicRegistration: NotRequired[bool]
+@dataclass
+class SelectionRangeClientCapabilities:
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration for selection range providers. If this is set to `true`
 	the client supports the new `SelectionRangeRegistrationOptions` return value for the corresponding server
 	capability as well."""
 
 
-class ClientDiagnosticsTagOptions(TypedDict, total=False):
+@dataclass
+class ClientDiagnosticsTagOptions:
 	"""@since 3.18.0"""
 	valueSet: List[DiagnosticTag]
 	"""The tags supported by the client."""
 
 
-class DiagnosticsCapabilities(TypedDict, total=False):
+@dataclass
+class DiagnosticsCapabilities:
 	"""General diagnostics capabilities for pull and push model."""
-	relatedInformation: NotRequired[bool]
+	relatedInformation: bool = optional_field()
 	"""Whether the clients accepts diagnostics with related information."""
-	tagSupport: NotRequired[ClientDiagnosticsTagOptions]
+	tagSupport: ClientDiagnosticsTagOptions = optional_field()
 	"""Client supports the tag property to provide meta data about a diagnostic.
 	Clients supporting tags have to handle unknown tags gracefully.
 
 	@since 3.15.0"""
-	codeDescriptionSupport: NotRequired[bool]
+	codeDescriptionSupport: bool = optional_field()
 	"""Client supports a codeDescription property
 
 	@since 3.16.0"""
-	dataSupport: NotRequired[bool]
+	dataSupport: bool = optional_field()
 	"""Whether code action supports the `data` property which is
 	preserved between a `textDocument/publishDiagnostics` and
 	`textDocument/codeAction` request.
@@ -3238,43 +3473,48 @@ class DiagnosticsCapabilities(TypedDict, total=False):
 	@since 3.16.0"""
 
 
+@dataclass
 class PublishDiagnosticsClientCapabilities(DiagnosticsCapabilities):
 	"""The publish diagnostic client capabilities."""
-	versionSupport: NotRequired[bool]
+	versionSupport: bool = optional_field()
 	"""Whether the client interprets the version property of the
 	`textDocument/publishDiagnostics` notification's parameter.
 
 	@since 3.15.0"""
 
 
-class CallHierarchyClientCapabilities(TypedDict, total=False):
+@dataclass
+class CallHierarchyClientCapabilities:
 	"""@since 3.16.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
 
 
-class ClientSemanticTokensRequestFullDelta(TypedDict, total=False):
+@dataclass
+class ClientSemanticTokensRequestFullDelta:
 	"""@since 3.18.0"""
-	delta: NotRequired[bool]
+	delta: bool = optional_field()
 	"""The client will send the `textDocument/semanticTokens/full/delta` request if
 	the server provides a corresponding handler."""
 
 
-class ClientSemanticTokensRequestOptions(TypedDict, total=False):
+@dataclass
+class ClientSemanticTokensRequestOptions:
 	"""@since 3.18.0"""
-	range: NotRequired[Union[bool, Literal['']]]
+	range: Union[bool, Literal['']] = optional_field()
 	"""The client will send the `textDocument/semanticTokens/range` request if
 	the server provides a corresponding handler."""
-	full: NotRequired[Union[bool, ClientSemanticTokensRequestFullDelta]]
+	full: Union[bool, ClientSemanticTokensRequestFullDelta] = optional_field()
 	"""The client will send the `textDocument/semanticTokens/full` request if
 	the server provides a corresponding handler."""
 
 
-class SemanticTokensClientCapabilities(TypedDict, total=False):
+@dataclass
+class SemanticTokensClientCapabilities:
 	"""@since 3.16.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
@@ -3293,18 +3533,18 @@ class SemanticTokensClientCapabilities(TypedDict, total=False):
 	"""The token modifiers that the client supports."""
 	formats: List[TokenFormat]
 	"""The token formats the clients supports."""
-	overlappingTokenSupport: NotRequired[bool]
+	overlappingTokenSupport: bool = optional_field()
 	"""Whether the client supports tokens that can overlap each other."""
-	multilineTokenSupport: NotRequired[bool]
+	multilineTokenSupport: bool = optional_field()
 	"""Whether the client supports tokens that can span multiple lines."""
-	serverCancelSupport: NotRequired[bool]
+	serverCancelSupport: bool = optional_field()
 	"""Whether the client allows the server to actively cancel a
 	semantic token request, e.g. supports returning
 	LSPErrorCodes.ServerCancelled. If a server does the client
 	needs to retrigger the request.
 
 	@since 3.17.0"""
-	augmentsSyntaxTokens: NotRequired[bool]
+	augmentsSyntaxTokens: bool = optional_field()
 	"""Whether the client uses semantic tokens to augment existing
 	syntax tokens. If set to `true` client side created syntax
 	tokens and semantic tokens are both used for colorization. If
@@ -3317,196 +3557,207 @@ class SemanticTokensClientCapabilities(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class LinkedEditingRangeClientCapabilities(TypedDict, total=False):
+@dataclass
+class LinkedEditingRangeClientCapabilities:
 	"""Client capabilities for the linked editing range request.
 
 	@since 3.16.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
 
 
-class MonikerClientCapabilities(TypedDict, total=False):
+@dataclass
+class MonikerClientCapabilities:
 	"""Client capabilities specific to the moniker request.
 
 	@since 3.16.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether moniker supports dynamic registration. If this is set to `true`
 	the client supports the new `MonikerRegistrationOptions` return value
 	for the corresponding server capability as well."""
 
 
-class TypeHierarchyClientCapabilities(TypedDict, total=False):
+@dataclass
+class TypeHierarchyClientCapabilities:
 	"""@since 3.17.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
 
 
-class InlineValueClientCapabilities(TypedDict, total=False):
+@dataclass
+class InlineValueClientCapabilities:
 	"""Client capabilities specific to inline values.
 
 	@since 3.17.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration for inline value providers."""
 
 
-class ClientInlayHintResolveOptions(TypedDict, total=False):
+@dataclass
+class ClientInlayHintResolveOptions:
 	"""@since 3.18.0"""
 	properties: List[str]
 	"""The properties that a client can resolve lazily."""
 
 
-class InlayHintClientCapabilities(TypedDict, total=False):
+@dataclass
+class InlayHintClientCapabilities:
 	"""Inlay hint client capabilities.
 
 	@since 3.17.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether inlay hints support dynamic registration."""
-	resolveSupport: NotRequired[ClientInlayHintResolveOptions]
+	resolveSupport: ClientInlayHintResolveOptions = optional_field()
 	"""Indicates which properties a client can resolve lazily on an inlay
 	hint."""
 
 
+@dataclass
 class DiagnosticClientCapabilities(DiagnosticsCapabilities):
 	"""Client capabilities specific to diagnostic pull requests.
 
 	@since 3.17.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is set to `true`
 	the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
-	relatedDocumentSupport: NotRequired[bool]
+	relatedDocumentSupport: bool = optional_field()
 	"""Whether the clients supports related documents for document diagnostic pulls."""
 
 
-class InlineCompletionClientCapabilities(TypedDict, total=False):
+@dataclass
+class InlineCompletionClientCapabilities:
 	"""Client capabilities specific to inline completions.
 
 	@since 3.18.0
 	@proposed"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration for inline completion providers."""
 
 
-class TextDocumentClientCapabilities(TypedDict, total=False):
+@dataclass
+class TextDocumentClientCapabilities:
 	"""Text document specific client capabilities."""
-	synchronization: NotRequired[TextDocumentSyncClientCapabilities]
+	synchronization: TextDocumentSyncClientCapabilities = optional_field()
 	"""Defines which synchronization capabilities the client supports."""
-	filters: NotRequired[TextDocumentFilterClientCapabilities]
+	filters: TextDocumentFilterClientCapabilities = optional_field()
 	"""Defines which filters the client supports.
 
 	@since 3.18.0"""
-	completion: NotRequired[CompletionClientCapabilities]
+	completion: CompletionClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/completion` request."""
-	hover: NotRequired[HoverClientCapabilities]
+	hover: HoverClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/hover` request."""
-	signatureHelp: NotRequired[SignatureHelpClientCapabilities]
+	signatureHelp: SignatureHelpClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/signatureHelp` request."""
-	declaration: NotRequired[DeclarationClientCapabilities]
+	declaration: DeclarationClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/declaration` request.
 
 	@since 3.14.0"""
-	definition: NotRequired[DefinitionClientCapabilities]
+	definition: DefinitionClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/definition` request."""
-	typeDefinition: NotRequired[TypeDefinitionClientCapabilities]
+	typeDefinition: TypeDefinitionClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/typeDefinition` request.
 
 	@since 3.6.0"""
-	implementation: NotRequired[ImplementationClientCapabilities]
+	implementation: ImplementationClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/implementation` request.
 
 	@since 3.6.0"""
-	references: NotRequired[ReferenceClientCapabilities]
+	references: ReferenceClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/references` request."""
-	documentHighlight: NotRequired[DocumentHighlightClientCapabilities]
+	documentHighlight: DocumentHighlightClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/documentHighlight` request."""
-	documentSymbol: NotRequired[DocumentSymbolClientCapabilities]
+	documentSymbol: DocumentSymbolClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/documentSymbol` request."""
-	codeAction: NotRequired[CodeActionClientCapabilities]
+	codeAction: CodeActionClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/codeAction` request."""
-	codeLens: NotRequired[CodeLensClientCapabilities]
+	codeLens: CodeLensClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/codeLens` request."""
-	documentLink: NotRequired[DocumentLinkClientCapabilities]
+	documentLink: DocumentLinkClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/documentLink` request."""
-	colorProvider: NotRequired[DocumentColorClientCapabilities]
+	colorProvider: DocumentColorClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/documentColor` and the
 	`textDocument/colorPresentation` request.
 
 	@since 3.6.0"""
-	formatting: NotRequired[DocumentFormattingClientCapabilities]
+	formatting: DocumentFormattingClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/formatting` request."""
-	rangeFormatting: NotRequired[DocumentRangeFormattingClientCapabilities]
+	rangeFormatting: DocumentRangeFormattingClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/rangeFormatting` request."""
-	onTypeFormatting: NotRequired[DocumentOnTypeFormattingClientCapabilities]
+	onTypeFormatting: DocumentOnTypeFormattingClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/onTypeFormatting` request."""
-	rename: NotRequired[RenameClientCapabilities]
+	rename: RenameClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/rename` request."""
-	foldingRange: NotRequired[FoldingRangeClientCapabilities]
+	foldingRange: FoldingRangeClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/foldingRange` request.
 
 	@since 3.10.0"""
-	selectionRange: NotRequired[SelectionRangeClientCapabilities]
+	selectionRange: SelectionRangeClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/selectionRange` request.
 
 	@since 3.15.0"""
-	publishDiagnostics: NotRequired[PublishDiagnosticsClientCapabilities]
+	publishDiagnostics: PublishDiagnosticsClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/publishDiagnostics` notification."""
-	callHierarchy: NotRequired[CallHierarchyClientCapabilities]
+	callHierarchy: CallHierarchyClientCapabilities = optional_field()
 	"""Capabilities specific to the various call hierarchy requests.
 
 	@since 3.16.0"""
-	semanticTokens: NotRequired[SemanticTokensClientCapabilities]
+	semanticTokens: SemanticTokensClientCapabilities = optional_field()
 	"""Capabilities specific to the various semantic token request.
 
 	@since 3.16.0"""
-	linkedEditingRange: NotRequired[LinkedEditingRangeClientCapabilities]
+	linkedEditingRange: LinkedEditingRangeClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/linkedEditingRange` request.
 
 	@since 3.16.0"""
-	moniker: NotRequired[MonikerClientCapabilities]
+	moniker: MonikerClientCapabilities = optional_field()
 	"""Client capabilities specific to the `textDocument/moniker` request.
 
 	@since 3.16.0"""
-	typeHierarchy: NotRequired[TypeHierarchyClientCapabilities]
+	typeHierarchy: TypeHierarchyClientCapabilities = optional_field()
 	"""Capabilities specific to the various type hierarchy requests.
 
 	@since 3.17.0"""
-	inlineValue: NotRequired[InlineValueClientCapabilities]
+	inlineValue: InlineValueClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/inlineValue` request.
 
 	@since 3.17.0"""
-	inlayHint: NotRequired[InlayHintClientCapabilities]
+	inlayHint: InlayHintClientCapabilities = optional_field()
 	"""Capabilities specific to the `textDocument/inlayHint` request.
 
 	@since 3.17.0"""
-	diagnostic: NotRequired[DiagnosticClientCapabilities]
+	diagnostic: DiagnosticClientCapabilities = optional_field()
 	"""Capabilities specific to the diagnostic pull model.
 
 	@since 3.17.0"""
-	inlineCompletion: NotRequired[InlineCompletionClientCapabilities]
+	inlineCompletion: InlineCompletionClientCapabilities = optional_field()
 	"""Client capabilities specific to inline completions.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class NotebookDocumentSyncClientCapabilities(TypedDict, total=False):
+@dataclass
+class NotebookDocumentSyncClientCapabilities:
 	"""Notebook specific client capabilities.
 
 	@since 3.17.0"""
-	dynamicRegistration: NotRequired[bool]
+	dynamicRegistration: bool = optional_field()
 	"""Whether implementation supports dynamic registration. If this is
 	set to `true` the client supports the new
 	`(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
 	return value for the corresponding server capability as well."""
-	executionSummarySupport: NotRequired[bool]
+	executionSummarySupport: bool = optional_field()
 	"""The client supports sending execution summary data per cell."""
 
 
-class NotebookDocumentClientCapabilities(TypedDict, total=False):
+@dataclass
+class NotebookDocumentClientCapabilities:
 	"""Capabilities specific to the notebook document support.
 
 	@since 3.17.0"""
@@ -3516,21 +3767,24 @@ class NotebookDocumentClientCapabilities(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class ClientShowMessageActionItemOptions(TypedDict, total=False):
+@dataclass
+class ClientShowMessageActionItemOptions:
 	"""@since 3.18.0"""
-	additionalPropertiesSupport: NotRequired[bool]
+	additionalPropertiesSupport: bool = optional_field()
 	"""Whether the client supports additional attributes which
 	are preserved and send back to the server in the
 	request's response."""
 
 
-class ShowMessageRequestClientCapabilities(TypedDict, total=False):
+@dataclass
+class ShowMessageRequestClientCapabilities:
 	"""Show message request client capabilities"""
-	messageActionItem: NotRequired[ClientShowMessageActionItemOptions]
+	messageActionItem: ClientShowMessageActionItemOptions = optional_field()
 	"""Capabilities specific to the `MessageActionItem` type."""
 
 
-class ShowDocumentClientCapabilities(TypedDict, total=False):
+@dataclass
+class ShowDocumentClientCapabilities:
 	"""Client capabilities for the showDocument request.
 
 	@since 3.16.0"""
@@ -3539,8 +3793,9 @@ class ShowDocumentClientCapabilities(TypedDict, total=False):
 	request."""
 
 
-class WindowClientCapabilities(TypedDict, total=False):
-	workDoneProgress: NotRequired[bool]
+@dataclass
+class WindowClientCapabilities:
+	workDoneProgress: bool = optional_field()
 	"""It indicates whether the client supports server initiated
 	progress using the `window/workDoneProgress/create` request.
 
@@ -3550,17 +3805,18 @@ class WindowClientCapabilities(TypedDict, total=False):
 	capabilities.
 
 	@since 3.15.0"""
-	showMessage: NotRequired[ShowMessageRequestClientCapabilities]
+	showMessage: ShowMessageRequestClientCapabilities = optional_field()
 	"""Capabilities specific to the showMessage request.
 
 	@since 3.16.0"""
-	showDocument: NotRequired[ShowDocumentClientCapabilities]
+	showDocument: ShowDocumentClientCapabilities = optional_field()
 	"""Capabilities specific to the showDocument request.
 
 	@since 3.16.0"""
 
 
-class StaleRequestSupportOptions(TypedDict, total=False):
+@dataclass
+class StaleRequestSupportOptions:
 	"""@since 3.18.0"""
 	cancel: bool
 	"""The client will actively cancel the request."""
@@ -3572,51 +3828,54 @@ class StaleRequestSupportOptions(TypedDict, total=False):
 
 RegularExpressionEngineKind: TypeAlias = str
 
-class RegularExpressionsClientCapabilities(TypedDict, total=False):
+@dataclass
+class RegularExpressionsClientCapabilities:
 	"""Client capabilities specific to regular expressions.
 
 	@since 3.16.0"""
 	engine: RegularExpressionEngineKind
 	"""The engine's name."""
-	version: NotRequired[str]
+	version: str = optional_field()
 	"""The engine's version."""
 
 
-class MarkdownClientCapabilities(TypedDict, total=False):
+@dataclass
+class MarkdownClientCapabilities:
 	"""Client capabilities specific to the used markdown parser.
 
 	@since 3.16.0"""
 	parser: str
 	"""The name of the parser."""
-	version: NotRequired[str]
+	version: str = optional_field()
 	"""The version of the parser."""
-	allowedTags: NotRequired[List[str]]
+	allowedTags: List[str] = optional_field()
 	"""A list of HTML tags that the client allows / supports in
 	Markdown.
 
 	@since 3.17.0"""
 
 
-class GeneralClientCapabilities(TypedDict, total=False):
+@dataclass
+class GeneralClientCapabilities:
 	"""General client capabilities.
 
 	@since 3.16.0"""
-	staleRequestSupport: NotRequired[StaleRequestSupportOptions]
+	staleRequestSupport: StaleRequestSupportOptions = optional_field()
 	"""Client capability that signals how the client
 	handles stale requests (e.g. a request
 	for which the client will not process the response
 	anymore since the information is outdated).
 
 	@since 3.17.0"""
-	regularExpressions: NotRequired[RegularExpressionsClientCapabilities]
+	regularExpressions: RegularExpressionsClientCapabilities = optional_field()
 	"""Client capabilities specific to regular expressions.
 
 	@since 3.16.0"""
-	markdown: NotRequired[MarkdownClientCapabilities]
+	markdown: MarkdownClientCapabilities = optional_field()
 	"""Client capabilities specific to the client's markdown parser.
 
 	@since 3.16.0"""
-	positionEncodings: NotRequired[List[PositionEncodingKind]]
+	positionEncodings: List[PositionEncodingKind] = optional_field()
 	"""The position encodings supported by the client. Client and server
 	have to agree on the same position encoding to ensure that offsets
 	(e.g. character position in a line) are interpreted the same on both
@@ -3637,27 +3896,29 @@ class GeneralClientCapabilities(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class ClientCapabilities(TypedDict, total=False):
+@dataclass
+class ClientCapabilities:
 	"""Defines the capabilities provided by the client."""
-	workspace: NotRequired[WorkspaceClientCapabilities]
+	workspace: WorkspaceClientCapabilities = optional_field()
 	"""Workspace specific client capabilities."""
-	textDocument: NotRequired[TextDocumentClientCapabilities]
+	textDocument: TextDocumentClientCapabilities = optional_field()
 	"""Text document specific client capabilities."""
-	notebookDocument: NotRequired[NotebookDocumentClientCapabilities]
+	notebookDocument: NotebookDocumentClientCapabilities = optional_field()
 	"""Capabilities specific to the notebook document support.
 
 	@since 3.17.0"""
-	window: NotRequired[WindowClientCapabilities]
+	window: WindowClientCapabilities = optional_field()
 	"""Window specific client capabilities."""
-	general: NotRequired[GeneralClientCapabilities]
+	general: GeneralClientCapabilities = optional_field()
 	"""General client capabilities.
 
 	@since 3.16.0"""
-	experimental: NotRequired[LSPAny]
+	experimental: LSPAny = optional_field()
 	"""Experimental client capabilities."""
 
 
-class _InitializeParams(TypedDict, total=False):
+@dataclass
+class _InitializeParams:
 	"""The initialize parameters"""
 	processId: Union[int, None]
 	"""The process Id of the parent process that started
@@ -3665,11 +3926,11 @@ class _InitializeParams(TypedDict, total=False):
 
 	Is `null` if the process has not been started by another process.
 	If the parent process is not alive then the server should exit."""
-	clientInfo: NotRequired[ClientInfo]
+	clientInfo: ClientInfo = optional_field()
 	"""Information about the client
 
 	@since 3.15.0"""
-	locale: NotRequired[str]
+	locale: str = optional_field()
 	"""The locale the client is currently showing the user interface
 	in. This must not necessarily be the locale of the operating
 	system.
@@ -3678,7 +3939,7 @@ class _InitializeParams(TypedDict, total=False):
 	(See https://en.wikipedia.org/wiki/IETF_language_tag)
 
 	@since 3.16.0"""
-	rootPath: NotRequired[Union[str, None]]
+	rootPath: Union[str, None] = optional_field()
 	"""The rootPath of the workspace. Is null
 	if no folder is open.
 
@@ -3691,16 +3952,17 @@ class _InitializeParams(TypedDict, total=False):
 	@deprecated in favour of workspaceFolders."""
 	capabilities: ClientCapabilities
 	"""The capabilities provided by the client (editor or tool)"""
-	initializationOptions: NotRequired[LSPAny]
+	initializationOptions: LSPAny = optional_field()
 	"""User provided initialization options."""
-	trace: NotRequired[TraceValue]
+	trace: TraceValue = optional_field()
 	"""The initial trace setting. If omitted trace is disabled ('off')."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class WorkspaceFoldersInitializeParams(TypedDict, total=False):
-	workspaceFolders: NotRequired[Union[List[WorkspaceFolder], None]]
+@dataclass
+class WorkspaceFoldersInitializeParams:
+	workspaceFolders: Union[List[WorkspaceFolder], None] = optional_field()
 	"""The workspace folders configured in the client when the server starts.
 
 	This property is only available if the client supports workspace folders.
@@ -3710,36 +3972,40 @@ class WorkspaceFoldersInitializeParams(TypedDict, total=False):
 	@since 3.6.0"""
 
 
+@dataclass
 class InitializeParams(_InitializeParams, WorkspaceFoldersInitializeParams):
 	""""""
 
-class SaveOptions(TypedDict, total=False):
+@dataclass
+class SaveOptions:
 	"""Save options."""
-	includeText: NotRequired[bool]
+	includeText: bool = optional_field()
 	"""The client is supposed to include the content on save."""
 
 
-class TextDocumentSyncOptions(TypedDict, total=False):
-	openClose: NotRequired[bool]
+@dataclass
+class TextDocumentSyncOptions:
+	openClose: bool = optional_field()
 	"""Open and close notifications are sent to the server. If omitted open close notification should not
 	be sent."""
-	change: NotRequired[TextDocumentSyncKind]
+	change: TextDocumentSyncKind = optional_field()
 	"""Change notifications are sent to the server. See TextDocumentSyncKind.None, TextDocumentSyncKind.Full
 	and TextDocumentSyncKind.Incremental. If omitted it defaults to TextDocumentSyncKind.None."""
-	willSave: NotRequired[bool]
+	willSave: bool = optional_field()
 	"""If present will save notifications are sent to the server. If omitted the notification should not be
 	sent."""
-	willSaveWaitUntil: NotRequired[bool]
+	willSaveWaitUntil: bool = optional_field()
 	"""If present will save wait until requests are sent to the server. If omitted the request should not be
 	sent."""
-	save: NotRequired[Union[bool, SaveOptions]]
+	save: Union[bool, SaveOptions] = optional_field()
 	"""If present save notifications are sent to the server. If omitted the notification should not be
 	sent."""
 
 
-class ServerCompletionItemOptions(TypedDict, total=False):
+@dataclass
+class ServerCompletionItemOptions:
 	"""@since 3.18.0"""
-	labelDetailsSupport: NotRequired[bool]
+	labelDetailsSupport: bool = optional_field()
 	"""The server has support for completion item label
 	details (see also `CompletionItemLabelDetails`) when
 	receiving a completion item in a resolve call.
@@ -3747,9 +4013,10 @@ class ServerCompletionItemOptions(TypedDict, total=False):
 	@since 3.17.0"""
 
 
-class CompletionOptions(TypedDict, total=False):
+@dataclass
+class CompletionOptions:
 	"""Completion options."""
-	triggerCharacters: NotRequired[List[str]]
+	triggerCharacters: List[str] = optional_field()
 	"""Most tools trigger completion request automatically without explicitly requesting
 	it using a keyboard shortcut (e.g. Ctrl+Space). Typically they do so when the user
 	starts to type an identifier. For example if the user types `c` in a JavaScript file
@@ -3758,7 +4025,7 @@ class CompletionOptions(TypedDict, total=False):
 
 	If code complete should automatically be trigger on characters not being valid inside
 	an identifier (for example `.` in JavaScript) list them in `triggerCharacters`."""
-	allCommitCharacters: NotRequired[List[str]]
+	allCommitCharacters: List[str] = optional_field()
 	"""The list of all possible characters that commit a completion. This field can be used
 	if clients don't support individual commit characters per completion item. See
 	`ClientCapabilities.textDocument.completion.completionItem.commitCharactersSupport`
@@ -3767,62 +4034,69 @@ class CompletionOptions(TypedDict, total=False):
 	completion item the ones on the completion item win.
 
 	@since 3.2.0"""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""The server provides support to resolve additional
 	information for a completion item."""
-	completionItem: NotRequired[ServerCompletionItemOptions]
+	completionItem: ServerCompletionItemOptions = optional_field()
 	"""The server supports the following `CompletionItem` specific
 	capabilities.
 
 	@since 3.17.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class HoverOptions(TypedDict, total=False):
+@dataclass
+class HoverOptions:
 	"""Hover options."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class SignatureHelpOptions(TypedDict, total=False):
+@dataclass
+class SignatureHelpOptions:
 	"""Server Capabilities for a {@link SignatureHelpRequest}."""
-	triggerCharacters: NotRequired[List[str]]
+	triggerCharacters: List[str] = optional_field()
 	"""List of characters that trigger signature help automatically."""
-	retriggerCharacters: NotRequired[List[str]]
+	retriggerCharacters: List[str] = optional_field()
 	"""List of characters that re-trigger signature help.
 
 	These trigger characters are only active when signature help is already showing. All trigger characters
 	are also counted as re-trigger characters.
 
 	@since 3.15.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DefinitionOptions(TypedDict, total=False):
+@dataclass
+class DefinitionOptions:
 	"""Server Capabilities for a {@link DefinitionRequest}."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class ReferenceOptions(TypedDict, total=False):
+@dataclass
+class ReferenceOptions:
 	"""Reference options."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentHighlightOptions(TypedDict, total=False):
+@dataclass
+class DocumentHighlightOptions:
 	"""Provider options for a {@link DocumentHighlightRequest}."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentSymbolOptions(TypedDict, total=False):
+@dataclass
+class DocumentSymbolOptions:
 	"""Provider options for a {@link DocumentSymbolRequest}."""
-	label: NotRequired[str]
+	label: str = optional_field()
 	"""A human-readable string that is shown when multiple outlines trees
 	are shown for the same document.
 
 	@since 3.16.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class CodeActionKindDocumentation(TypedDict, total=False):
+@dataclass
+class CodeActionKindDocumentation:
 	"""Documentation for a class of code actions.
 
 	@since 3.18.0
@@ -3839,14 +4113,15 @@ class CodeActionKindDocumentation(TypedDict, total=False):
 	The title of this documentation code action is taken from {@linkcode Command.title}"""
 
 
-class CodeActionOptions(TypedDict, total=False):
+@dataclass
+class CodeActionOptions:
 	"""Provider options for a {@link CodeActionRequest}."""
-	codeActionKinds: NotRequired[List[CodeActionKind]]
+	codeActionKinds: List[CodeActionKind] = optional_field()
 	"""CodeActionKinds that this server may return.
 
 	The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
 	may list out every specific kind they provide."""
-	documentation: NotRequired[List[CodeActionKindDocumentation]]
+	documentation: List[CodeActionKindDocumentation] = optional_field()
 	"""Static documentation for a class of code actions.
 
 	Documentation from the provider should be shown in the code actions menu if either:
@@ -3862,81 +4137,90 @@ class CodeActionOptions(TypedDict, total=False):
 
 	@since 3.18.0
 	@proposed"""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""The server provides support to resolve additional
 	information for a code action.
 
 	@since 3.16.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class CodeLensOptions(TypedDict, total=False):
+@dataclass
+class CodeLensOptions:
 	"""Code Lens provider options of a {@link CodeLensRequest}."""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""Code lens has a resolve provider as well."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentLinkOptions(TypedDict, total=False):
+@dataclass
+class DocumentLinkOptions:
 	"""Provider options for a {@link DocumentLinkRequest}."""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""Document links have a resolve provider as well."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class WorkspaceSymbolOptions(TypedDict, total=False):
+@dataclass
+class WorkspaceSymbolOptions:
 	"""Server capabilities for a {@link WorkspaceSymbolRequest}."""
-	resolveProvider: NotRequired[bool]
+	resolveProvider: bool = optional_field()
 	"""The server provides support to resolve additional
 	information for a workspace symbol.
 
 	@since 3.17.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentFormattingOptions(TypedDict, total=False):
+@dataclass
+class DocumentFormattingOptions:
 	"""Provider options for a {@link DocumentFormattingRequest}."""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentRangeFormattingOptions(TypedDict, total=False):
+@dataclass
+class DocumentRangeFormattingOptions:
 	"""Provider options for a {@link DocumentRangeFormattingRequest}."""
-	rangesSupport: NotRequired[bool]
+	rangesSupport: bool = optional_field()
 	"""Whether the server supports formatting multiple ranges at once.
 
 	@since 3.18.0
 	@proposed"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class DocumentOnTypeFormattingOptions(TypedDict, total=False):
+@dataclass
+class DocumentOnTypeFormattingOptions:
 	"""Provider options for a {@link DocumentOnTypeFormattingRequest}."""
 	firstTriggerCharacter: str
 	"""A character on which formatting should be triggered, like `{`."""
-	moreTriggerCharacter: NotRequired[List[str]]
+	moreTriggerCharacter: List[str] = optional_field()
 	"""More trigger characters."""
 
 
-class RenameOptions(TypedDict, total=False):
+@dataclass
+class RenameOptions:
 	"""Provider options for a {@link RenameRequest}."""
-	prepareProvider: NotRequired[bool]
+	prepareProvider: bool = optional_field()
 	"""Renames should be checked and tested before being executed.
 
 	@since version 3.12.0"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class ExecuteCommandOptions(TypedDict, total=False):
+@dataclass
+class ExecuteCommandOptions:
 	"""The server capabilities of a {@link ExecuteCommandRequest}."""
 	commands: List[str]
 	"""The commands to be executed on the server"""
-	workDoneProgress: NotRequired[bool]
+	workDoneProgress: bool = optional_field()
 
 
-class WorkspaceFoldersServerCapabilities(TypedDict, total=False):
-	supported: NotRequired[bool]
+@dataclass
+class WorkspaceFoldersServerCapabilities:
+	supported: bool = optional_field()
 	"""The server has support for workspace folders"""
-	changeNotifications: NotRequired[Union[str, bool]]
+	changeNotifications: Union[str, bool] = optional_field()
 	"""Whether the server wants to receive workspace folder
 	change notifications.
 
@@ -3946,47 +4230,50 @@ class WorkspaceFoldersServerCapabilities(TypedDict, total=False):
 	using the `client/unregisterCapability` request."""
 
 
-class FileOperationOptions(TypedDict, total=False):
+@dataclass
+class FileOperationOptions:
 	"""Options for notifications/requests for user operations on files.
 
 	@since 3.16.0"""
-	didCreate: NotRequired[FileOperationRegistrationOptions]
+	didCreate: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving didCreateFiles notifications."""
-	willCreate: NotRequired[FileOperationRegistrationOptions]
+	willCreate: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving willCreateFiles requests."""
-	didRename: NotRequired[FileOperationRegistrationOptions]
+	didRename: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving didRenameFiles notifications."""
-	willRename: NotRequired[FileOperationRegistrationOptions]
+	willRename: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving willRenameFiles requests."""
-	didDelete: NotRequired[FileOperationRegistrationOptions]
+	didDelete: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving didDeleteFiles file notifications."""
-	willDelete: NotRequired[FileOperationRegistrationOptions]
+	willDelete: FileOperationRegistrationOptions = optional_field()
 	"""The server is interested in receiving willDeleteFiles file requests."""
 
 
-class WorkspaceOptions(TypedDict, total=False):
+@dataclass
+class WorkspaceOptions:
 	"""Defines workspace specific capabilities of the server.
 
 	@since 3.18.0"""
-	workspaceFolders: NotRequired[WorkspaceFoldersServerCapabilities]
+	workspaceFolders: WorkspaceFoldersServerCapabilities = optional_field()
 	"""The server supports workspace folder.
 
 	@since 3.6.0"""
-	fileOperations: NotRequired[FileOperationOptions]
+	fileOperations: FileOperationOptions = optional_field()
 	"""The server is interested in notifications/requests for operations on files.
 
 	@since 3.16.0"""
-	textDocumentContent: NotRequired[Union[TextDocumentContentOptions, TextDocumentContentRegistrationOptions]]
+	textDocumentContent: Union[TextDocumentContentOptions, TextDocumentContentRegistrationOptions] = optional_field()
 	"""The server supports the `workspace/textDocumentContent` request.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class ServerCapabilities(TypedDict, total=False):
+@dataclass
+class ServerCapabilities:
 	"""Defines the capabilities provided by a language
 	server."""
-	positionEncoding: NotRequired[PositionEncodingKind]
+	positionEncoding: PositionEncodingKind = optional_field()
 	"""The position encoding the server picked from the encodings offered
 	by the client via the client capability `general.positionEncodings`.
 
@@ -3996,127 +4283,130 @@ class ServerCapabilities(TypedDict, total=False):
 	If omitted it defaults to 'utf-16'.
 
 	@since 3.17.0"""
-	textDocumentSync: NotRequired[Union[TextDocumentSyncOptions, TextDocumentSyncKind]]
+	textDocumentSync: Union[TextDocumentSyncOptions, TextDocumentSyncKind] = optional_field()
 	"""Defines how text documents are synced. Is either a detailed structure
 	defining each notification or for backwards compatibility the
 	TextDocumentSyncKind number."""
-	notebookDocumentSync: NotRequired[Union[NotebookDocumentSyncOptions, NotebookDocumentSyncRegistrationOptions]]
+	notebookDocumentSync: Union[NotebookDocumentSyncOptions, NotebookDocumentSyncRegistrationOptions] = optional_field()
 	"""Defines how notebook documents are synced.
 
 	@since 3.17.0"""
-	completionProvider: NotRequired[CompletionOptions]
+	completionProvider: CompletionOptions = optional_field()
 	"""The server provides completion support."""
-	hoverProvider: NotRequired[Union[bool, HoverOptions]]
+	hoverProvider: Union[bool, HoverOptions] = optional_field()
 	"""The server provides hover support."""
-	signatureHelpProvider: NotRequired[SignatureHelpOptions]
+	signatureHelpProvider: SignatureHelpOptions = optional_field()
 	"""The server provides signature help support."""
-	declarationProvider: NotRequired[Union[bool, DeclarationOptions, DeclarationRegistrationOptions]]
+	declarationProvider: Union[bool, DeclarationOptions, DeclarationRegistrationOptions] = optional_field()
 	"""The server provides Goto Declaration support."""
-	definitionProvider: NotRequired[Union[bool, DefinitionOptions]]
+	definitionProvider: Union[bool, DefinitionOptions] = optional_field()
 	"""The server provides goto definition support."""
-	typeDefinitionProvider: NotRequired[Union[bool, TypeDefinitionOptions, TypeDefinitionRegistrationOptions]]
+	typeDefinitionProvider: Union[bool, TypeDefinitionOptions, TypeDefinitionRegistrationOptions] = optional_field()
 	"""The server provides Goto Type Definition support."""
-	implementationProvider: NotRequired[Union[bool, ImplementationOptions, ImplementationRegistrationOptions]]
+	implementationProvider: Union[bool, ImplementationOptions, ImplementationRegistrationOptions] = optional_field()
 	"""The server provides Goto Implementation support."""
-	referencesProvider: NotRequired[Union[bool, ReferenceOptions]]
+	referencesProvider: Union[bool, ReferenceOptions] = optional_field()
 	"""The server provides find references support."""
-	documentHighlightProvider: NotRequired[Union[bool, DocumentHighlightOptions]]
+	documentHighlightProvider: Union[bool, DocumentHighlightOptions] = optional_field()
 	"""The server provides document highlight support."""
-	documentSymbolProvider: NotRequired[Union[bool, DocumentSymbolOptions]]
+	documentSymbolProvider: Union[bool, DocumentSymbolOptions] = optional_field()
 	"""The server provides document symbol support."""
-	codeActionProvider: NotRequired[Union[bool, CodeActionOptions]]
+	codeActionProvider: Union[bool, CodeActionOptions] = optional_field()
 	"""The server provides code actions. CodeActionOptions may only be
 	specified if the client states that it supports
 	`codeActionLiteralSupport` in its initial `initialize` request."""
-	codeLensProvider: NotRequired[CodeLensOptions]
+	codeLensProvider: CodeLensOptions = optional_field()
 	"""The server provides code lens."""
-	documentLinkProvider: NotRequired[DocumentLinkOptions]
+	documentLinkProvider: DocumentLinkOptions = optional_field()
 	"""The server provides document link support."""
-	colorProvider: NotRequired[Union[bool, DocumentColorOptions, DocumentColorRegistrationOptions]]
+	colorProvider: Union[bool, DocumentColorOptions, DocumentColorRegistrationOptions] = optional_field()
 	"""The server provides color provider support."""
-	workspaceSymbolProvider: NotRequired[Union[bool, WorkspaceSymbolOptions]]
+	workspaceSymbolProvider: Union[bool, WorkspaceSymbolOptions] = optional_field()
 	"""The server provides workspace symbol support."""
-	documentFormattingProvider: NotRequired[Union[bool, DocumentFormattingOptions]]
+	documentFormattingProvider: Union[bool, DocumentFormattingOptions] = optional_field()
 	"""The server provides document formatting."""
-	documentRangeFormattingProvider: NotRequired[Union[bool, DocumentRangeFormattingOptions]]
+	documentRangeFormattingProvider: Union[bool, DocumentRangeFormattingOptions] = optional_field()
 	"""The server provides document range formatting."""
-	documentOnTypeFormattingProvider: NotRequired[DocumentOnTypeFormattingOptions]
+	documentOnTypeFormattingProvider: DocumentOnTypeFormattingOptions = optional_field()
 	"""The server provides document formatting on typing."""
-	renameProvider: NotRequired[Union[bool, RenameOptions]]
+	renameProvider: Union[bool, RenameOptions] = optional_field()
 	"""The server provides rename support. RenameOptions may only be
 	specified if the client states that it supports
 	`prepareSupport` in its initial `initialize` request."""
-	foldingRangeProvider: NotRequired[Union[bool, FoldingRangeOptions, FoldingRangeRegistrationOptions]]
+	foldingRangeProvider: Union[bool, FoldingRangeOptions, FoldingRangeRegistrationOptions] = optional_field()
 	"""The server provides folding provider support."""
-	selectionRangeProvider: NotRequired[Union[bool, SelectionRangeOptions, SelectionRangeRegistrationOptions]]
+	selectionRangeProvider: Union[bool, SelectionRangeOptions, SelectionRangeRegistrationOptions] = optional_field()
 	"""The server provides selection range support."""
-	executeCommandProvider: NotRequired[ExecuteCommandOptions]
+	executeCommandProvider: ExecuteCommandOptions = optional_field()
 	"""The server provides execute command support."""
-	callHierarchyProvider: NotRequired[Union[bool, CallHierarchyOptions, CallHierarchyRegistrationOptions]]
+	callHierarchyProvider: Union[bool, CallHierarchyOptions, CallHierarchyRegistrationOptions] = optional_field()
 	"""The server provides call hierarchy support.
 
 	@since 3.16.0"""
-	linkedEditingRangeProvider: NotRequired[Union[bool, LinkedEditingRangeOptions, LinkedEditingRangeRegistrationOptions]]
+	linkedEditingRangeProvider: Union[bool, LinkedEditingRangeOptions, LinkedEditingRangeRegistrationOptions] = optional_field()
 	"""The server provides linked editing range support.
 
 	@since 3.16.0"""
-	semanticTokensProvider: NotRequired[Union[SemanticTokensOptions, SemanticTokensRegistrationOptions]]
+	semanticTokensProvider: Union[SemanticTokensOptions, SemanticTokensRegistrationOptions] = optional_field()
 	"""The server provides semantic tokens support.
 
 	@since 3.16.0"""
-	monikerProvider: NotRequired[Union[bool, MonikerOptions, MonikerRegistrationOptions]]
+	monikerProvider: Union[bool, MonikerOptions, MonikerRegistrationOptions] = optional_field()
 	"""The server provides moniker support.
 
 	@since 3.16.0"""
-	typeHierarchyProvider: NotRequired[Union[bool, TypeHierarchyOptions, TypeHierarchyRegistrationOptions]]
+	typeHierarchyProvider: Union[bool, TypeHierarchyOptions, TypeHierarchyRegistrationOptions] = optional_field()
 	"""The server provides type hierarchy support.
 
 	@since 3.17.0"""
-	inlineValueProvider: NotRequired[Union[bool, InlineValueOptions, InlineValueRegistrationOptions]]
+	inlineValueProvider: Union[bool, InlineValueOptions, InlineValueRegistrationOptions] = optional_field()
 	"""The server provides inline values.
 
 	@since 3.17.0"""
-	inlayHintProvider: NotRequired[Union[bool, InlayHintOptions, InlayHintRegistrationOptions]]
+	inlayHintProvider: Union[bool, InlayHintOptions, InlayHintRegistrationOptions] = optional_field()
 	"""The server provides inlay hints.
 
 	@since 3.17.0"""
-	diagnosticProvider: NotRequired[Union[DiagnosticOptions, DiagnosticRegistrationOptions]]
+	diagnosticProvider: Union[DiagnosticOptions, DiagnosticRegistrationOptions] = optional_field()
 	"""The server has support for pull model diagnostics.
 
 	@since 3.17.0"""
-	inlineCompletionProvider: NotRequired[Union[bool, InlineCompletionOptions]]
+	inlineCompletionProvider: Union[bool, InlineCompletionOptions] = optional_field()
 	"""Inline completion options used during static registration.
 
 	@since 3.18.0
 	@proposed"""
-	workspace: NotRequired[WorkspaceOptions]
+	workspace: WorkspaceOptions = optional_field()
 	"""Workspace specific server capabilities."""
-	experimental: NotRequired[LSPAny]
+	experimental: LSPAny = optional_field()
 	"""Experimental server capabilities."""
 
 
-class ServerInfo(TypedDict, total=False):
+@dataclass
+class ServerInfo:
 	"""Information about the server
 
 	@since 3.15.0
 	@since 3.18.0 ServerInfo type name added."""
 	name: str
 	"""The name of the server as defined by the server."""
-	version: NotRequired[str]
+	version: str = optional_field()
 	"""The server's version as defined by the server."""
 
 
-class InitializeResult(TypedDict, total=False):
+@dataclass
+class InitializeResult:
 	"""The result returned from an initialize request."""
 	capabilities: ServerCapabilities
 	"""The capabilities the language server provides."""
-	serverInfo: NotRequired[ServerInfo]
+	serverInfo: ServerInfo = optional_field()
 	"""Information about the server.
 
 	@since 3.15.0"""
 
 
-class InitializeError(TypedDict, total=False):
+@dataclass
+class InitializeError:
 	"""The data type of the ResponseError if the
 	initialize request fails."""
 	retry: bool
@@ -4126,20 +4416,24 @@ class InitializeError(TypedDict, total=False):
 	(3) if user selected retry the initialize method is sent again."""
 
 
-class InitializedParams(TypedDict, total=False):
+@dataclass
+class InitializedParams:
 	""""""
 
-class DidChangeConfigurationParams(TypedDict, total=False):
+@dataclass
+class DidChangeConfigurationParams:
 	"""The parameters of a change configuration notification."""
 	settings: LSPAny
 	"""The actual changed settings"""
 
 
-class DidChangeConfigurationRegistrationOptions(TypedDict, total=False):
-	section: NotRequired[Union[str, List[str]]]
+@dataclass
+class DidChangeConfigurationRegistrationOptions:
+	section: Union[str, List[str]] = optional_field()
 
 
-class ShowMessageParams(TypedDict, total=False):
+@dataclass
+class ShowMessageParams:
 	"""The parameters of a notification message."""
 	type_: MessageType
 	"""The message type. See {@link MessageType}"""
@@ -4147,21 +4441,24 @@ class ShowMessageParams(TypedDict, total=False):
 	"""The actual message."""
 
 
-class MessageActionItem(TypedDict, total=False):
+@dataclass
+class MessageActionItem:
 	title: str
 	"""A short title like 'Retry', 'Open Log' etc."""
 
 
-class ShowMessageRequestParams(TypedDict, total=False):
+@dataclass
+class ShowMessageRequestParams:
 	type_: MessageType
 	"""The message type. See {@link MessageType}"""
 	message: str
 	"""The actual message."""
-	actions: NotRequired[List[MessageActionItem]]
+	actions: List[MessageActionItem] = optional_field()
 	"""The message action items to present."""
 
 
-class LogMessageParams(TypedDict, total=False):
+@dataclass
+class LogMessageParams:
 	"""The log message parameters."""
 	type_: MessageType
 	"""The message type. See {@link MessageType}"""
@@ -4169,13 +4466,15 @@ class LogMessageParams(TypedDict, total=False):
 	"""The actual message."""
 
 
-class DidOpenTextDocumentParams(TypedDict, total=False):
+@dataclass
+class DidOpenTextDocumentParams:
 	"""The parameters sent in an open text document notification"""
 	textDocument: TextDocumentItem
 	"""The document that was opened."""
 
 
-class DidChangeTextDocumentParams(TypedDict, total=False):
+@dataclass
+class DidChangeTextDocumentParams:
 	"""The change text document notification's parameters."""
 	textDocument: VersionedTextDocumentIdentifier
 	"""The document that did change. The version number points
@@ -4195,31 +4494,36 @@ class DidChangeTextDocumentParams(TypedDict, total=False):
 	  you receive them."""
 
 
+@dataclass
 class TextDocumentChangeRegistrationOptions(TextDocumentRegistrationOptions):
 	"""Describe options to be used when registered for text document change events."""
 	syncKind: TextDocumentSyncKind
 	"""How documents are synced to the server."""
 
 
-class DidCloseTextDocumentParams(TypedDict, total=False):
+@dataclass
+class DidCloseTextDocumentParams:
 	"""The parameters sent in a close text document notification"""
 	textDocument: TextDocumentIdentifier
 	"""The document that was closed."""
 
 
-class DidSaveTextDocumentParams(TypedDict, total=False):
+@dataclass
+class DidSaveTextDocumentParams:
 	"""The parameters sent in a save text document notification"""
 	textDocument: TextDocumentIdentifier
 	"""The document that was saved."""
-	text: NotRequired[str]
+	text: str = optional_field()
 	"""Optional the content when saved. Depends on the includeText value
 	when the save notification was requested."""
 
 
+@dataclass
 class TextDocumentSaveRegistrationOptions(TextDocumentRegistrationOptions, SaveOptions):
 	"""Save registration options."""
 
-class WillSaveTextDocumentParams(TypedDict, total=False):
+@dataclass
+class WillSaveTextDocumentParams:
 	"""The parameters sent in a will save text document notification."""
 	textDocument: TextDocumentIdentifier
 	"""The document that will be saved."""
@@ -4227,7 +4531,8 @@ class WillSaveTextDocumentParams(TypedDict, total=False):
 	"""The 'TextDocumentSaveReason'."""
 
 
-class FileEvent(TypedDict, total=False):
+@dataclass
+class FileEvent:
 	"""An event describing a file change."""
 	uri: DocumentUri
 	"""The file's uri."""
@@ -4235,34 +4540,38 @@ class FileEvent(TypedDict, total=False):
 	"""The change type."""
 
 
-class DidChangeWatchedFilesParams(TypedDict, total=False):
+@dataclass
+class DidChangeWatchedFilesParams:
 	"""The watched files change notification's parameters."""
 	changes: List[FileEvent]
 	"""The actual file events."""
 
 
-class FileSystemWatcher(TypedDict, total=False):
+@dataclass
+class FileSystemWatcher:
 	globPattern: GlobPattern
 	"""The glob pattern to watch. See {@link GlobPattern glob pattern} for more detail.
 
 	@since 3.17.0 support for relative patterns."""
-	kind: NotRequired[WatchKind]
+	kind: WatchKind = optional_field()
 	"""The kind of events of interest. If omitted it defaults
 	to WatchKind.Create | WatchKind.Change | WatchKind.Delete
 	which is 7."""
 
 
-class DidChangeWatchedFilesRegistrationOptions(TypedDict, total=False):
+@dataclass
+class DidChangeWatchedFilesRegistrationOptions:
 	"""Describe options to be used when registered for text document change events."""
 	watchers: List[FileSystemWatcher]
 	"""The watchers to register."""
 
 
-class PublishDiagnosticsParams(TypedDict, total=False):
+@dataclass
+class PublishDiagnosticsParams:
 	"""The publish diagnostic notification's parameters."""
 	uri: DocumentUri
 	"""The URI for which diagnostic information is reported."""
-	version: NotRequired[int]
+	version: int = optional_field()
 	"""Optional the version number of the document the diagnostics are published for.
 
 	@since 3.15.0"""
@@ -4270,40 +4579,44 @@ class PublishDiagnosticsParams(TypedDict, total=False):
 	"""An array of diagnostic information items."""
 
 
-class CompletionContext(TypedDict, total=False):
+@dataclass
+class CompletionContext:
 	"""Contains additional information about the context in which a completion request is triggered."""
 	triggerKind: CompletionTriggerKind
 	"""How the completion was triggered."""
-	triggerCharacter: NotRequired[str]
+	triggerCharacter: str = optional_field()
 	"""The trigger character (a single character) that has trigger code complete.
 	Is undefined if `triggerKind !== CompletionTriggerKind.TriggerCharacter`"""
 
 
+@dataclass
 class CompletionParams(TextDocumentPositionParams):
 	"""Completion parameters"""
-	context: NotRequired[CompletionContext]
+	context: CompletionContext = optional_field()
 	"""The completion context. This is only available it the client specifies
 	to send this using the client capability `textDocument.completion.contextSupport === true`"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CompletionItemLabelDetails(TypedDict, total=False):
+@dataclass
+class CompletionItemLabelDetails:
 	"""Additional details for a completion item label.
 
 	@since 3.17.0"""
-	detail: NotRequired[str]
+	detail: str = optional_field()
 	"""An optional string which is rendered less prominently directly after {@link CompletionItem.label label},
 	without any spacing. Should be used for function signatures and type annotations."""
-	description: NotRequired[str]
+	description: str = optional_field()
 	"""An optional string which is rendered less prominently after {@link CompletionItem.detail}. Should be used
 	for fully qualified names and file paths."""
 
 
-class InsertReplaceEdit(TypedDict, total=False):
+@dataclass
+class InsertReplaceEdit:
 	"""A special text edit to provide an insert and a replace operation.
 
 	@since 3.16.0"""
@@ -4315,7 +4628,8 @@ class InsertReplaceEdit(TypedDict, total=False):
 	"""The range if the replace is requested."""
 
 
-class CompletionItem(TypedDict, total=False):
+@dataclass
+class CompletionItem:
 	"""A completion item represents a text snippet that is
 	proposed to complete text that is being typed."""
 	label: str
@@ -4326,40 +4640,40 @@ class CompletionItem(TypedDict, total=False):
 
 	If label details are provided the label itself should
 	be an unqualified name of the completion item."""
-	labelDetails: NotRequired[CompletionItemLabelDetails]
+	labelDetails: CompletionItemLabelDetails = optional_field()
 	"""Additional details for the label
 
 	@since 3.17.0"""
-	kind: NotRequired[CompletionItemKind]
+	kind: CompletionItemKind = optional_field()
 	"""The kind of this completion item. Based of the kind
 	an icon is chosen by the editor."""
-	tags: NotRequired[List[CompletionItemTag]]
+	tags: List[CompletionItemTag] = optional_field()
 	"""Tags for this completion item.
 
 	@since 3.15.0"""
-	detail: NotRequired[str]
+	detail: str = optional_field()
 	"""A human-readable string with additional information
 	about this item, like type or symbol information."""
-	documentation: NotRequired[Union[str, MarkupContent]]
+	documentation: Union[str, MarkupContent] = optional_field()
 	"""A human-readable string that represents a doc-comment."""
-	deprecated: NotRequired[bool]
+	deprecated: bool = optional_field()
 	"""Indicates if this item is deprecated.
 	@deprecated Use `tags` instead."""
-	preselect: NotRequired[bool]
+	preselect: bool = optional_field()
 	"""Select this item when showing.
 
 	*Note* that only one completion item can be selected and that the
 	tool / client decides which item that is. The rule is that the *first*
 	item of those that match best is selected."""
-	sortText: NotRequired[str]
+	sortText: str = optional_field()
 	"""A string that should be used when comparing this item
 	with other items. When `falsy` the {@link CompletionItem.label label}
 	is used."""
-	filterText: NotRequired[str]
+	filterText: str = optional_field()
 	"""A string that should be used when filtering a set of
 	completion items. When `falsy` the {@link CompletionItem.label label}
 	is used."""
-	insertText: NotRequired[str]
+	insertText: str = optional_field()
 	"""A string that should be inserted into a document when selecting
 	this completion. When `falsy` the {@link CompletionItem.label label}
 	is used.
@@ -4371,20 +4685,20 @@ class CompletionItem(TypedDict, total=False):
 	`console` is provided it will only insert `sole`. Therefore it is
 	recommended to use `textEdit` instead since it avoids additional client
 	side interpretation."""
-	insertTextFormat: NotRequired[InsertTextFormat]
+	insertTextFormat: InsertTextFormat = optional_field()
 	"""The format of the insert text. The format applies to both the
 	`insertText` property and the `newText` property of a provided
 	`textEdit`. If omitted defaults to `InsertTextFormat.PlainText`.
 
 	Please note that the insertTextFormat doesn't apply to
 	`additionalTextEdits`."""
-	insertTextMode: NotRequired[InsertTextMode]
+	insertTextMode: InsertTextMode = optional_field()
 	"""How whitespace and indentation is handled during completion
 	item insertion. If not provided the clients default value depends on
 	the `textDocument.completion.insertTextMode` client capability.
 
 	@since 3.16.0"""
-	textEdit: NotRequired[Union[TextEdit, InsertReplaceEdit]]
+	textEdit: Union[TextEdit, InsertReplaceEdit] = optional_field()
 	"""An {@link TextEdit edit} which is applied to a document when selecting
 	this completion. When an edit is provided the value of
 	{@link CompletionItem.insertText insertText} is ignored.
@@ -4405,7 +4719,7 @@ class CompletionItem(TypedDict, total=False):
 	contained and starting at the same position.
 
 	@since 3.16.0 additional type `InsertReplaceEdit`"""
-	textEditText: NotRequired[str]
+	textEditText: str = optional_field()
 	"""The edit text used if the completion item is part of a CompletionList and
 	CompletionList defines an item default for the text edit range.
 
@@ -4416,7 +4730,7 @@ class CompletionItem(TypedDict, total=False):
 	property is used as a text.
 
 	@since 3.17.0"""
-	additionalTextEdits: NotRequired[List[TextEdit]]
+	additionalTextEdits: List[TextEdit] = optional_field()
 	"""An optional array of additional {@link TextEdit text edits} that are applied when
 	selecting this completion. Edits must not overlap (including the same insert position)
 	with the main {@link CompletionItem.textEdit edit} nor with themselves.
@@ -4424,20 +4738,21 @@ class CompletionItem(TypedDict, total=False):
 	Additional text edits should be used to change text unrelated to the current cursor position
 	(for example adding an import statement at the top of the file if the completion item will
 	insert an unqualified type)."""
-	commitCharacters: NotRequired[List[str]]
+	commitCharacters: List[str] = optional_field()
 	"""An optional set of characters that when pressed while this completion is active will accept it first and
 	then type that character. *Note* that all commit characters should have `length=1` and that superfluous
 	characters will be ignored."""
-	command: NotRequired[Command]
+	command: Command = optional_field()
 	"""An optional {@link Command command} that is executed *after* inserting this completion. *Note* that
 	additional modifications to the current document should be described with the
 	{@link CompletionItem.additionalTextEdits additionalTextEdits}-property."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on a completion item between a
 	{@link CompletionRequest} and a {@link CompletionResolveRequest}."""
 
 
-class EditRangeWithInsertReplace(TypedDict, total=False):
+@dataclass
+class EditRangeWithInsertReplace:
 	"""Edit range variant that includes ranges for insert and replace operations.
 
 	@since 3.18.0"""
@@ -4445,7 +4760,8 @@ class EditRangeWithInsertReplace(TypedDict, total=False):
 	replace: Range
 
 
-class CompletionItemDefaults(TypedDict, total=False):
+@dataclass
+class CompletionItemDefaults:
 	"""In many cases the items of an actual completion result share the same
 	value for properties like `commitCharacters` or the range of a text
 	edit. A completion list can therefore define item defaults which will
@@ -4461,29 +4777,30 @@ class CompletionItemDefaults(TypedDict, total=False):
 	capability.
 
 	@since 3.17.0"""
-	commitCharacters: NotRequired[List[str]]
+	commitCharacters: List[str] = optional_field()
 	"""A default commit character set.
 
 	@since 3.17.0"""
-	editRange: NotRequired[Union[Range, EditRangeWithInsertReplace]]
+	editRange: Union[Range, EditRangeWithInsertReplace] = optional_field()
 	"""A default edit range.
 
 	@since 3.17.0"""
-	insertTextFormat: NotRequired[InsertTextFormat]
+	insertTextFormat: InsertTextFormat = optional_field()
 	"""A default insert text format.
 
 	@since 3.17.0"""
-	insertTextMode: NotRequired[InsertTextMode]
+	insertTextMode: InsertTextMode = optional_field()
 	"""A default insert text mode.
 
 	@since 3.17.0"""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A default data value.
 
 	@since 3.17.0"""
 
 
-class CompletionItemApplyKinds(TypedDict, total=False):
+@dataclass
+class CompletionItemApplyKinds:
 	"""Specifies how fields from a completion item should be combined with those
 	from `completionList.itemDefaults`.
 
@@ -4501,7 +4818,7 @@ class CompletionItemApplyKinds(TypedDict, total=False):
 	capability.
 
 	@since 3.18.0"""
-	commitCharacters: NotRequired[ApplyKind]
+	commitCharacters: ApplyKind = optional_field()
 	"""Specifies whether commitCharacters on a completion will replace or be
 	merged with those in `completionList.itemDefaults.commitCharacters`.
 
@@ -4517,7 +4834,7 @@ class CompletionItemApplyKinds(TypedDict, total=False):
 	and the completion's own `commitCharacters`.
 
 	@since 3.18.0"""
-	data: NotRequired[ApplyKind]
+	data: ApplyKind = optional_field()
 	"""Specifies whether the `data` field on a completion will replace or
 	be merged with data from `completionList.itemDefaults.data`.
 
@@ -4542,7 +4859,8 @@ class CompletionItemApplyKinds(TypedDict, total=False):
 	@since 3.18.0"""
 
 
-class CompletionList(TypedDict, total=False):
+@dataclass
+class CompletionList:
 	"""Represents a collection of {@link CompletionItem completion items} to be presented
 	in the editor."""
 	isIncomplete: bool
@@ -4550,7 +4868,7 @@ class CompletionList(TypedDict, total=False):
 
 	Recomputed lists have all their items replaced (not appended) in the
 	incomplete completion sessions."""
-	itemDefaults: NotRequired[CompletionItemDefaults]
+	itemDefaults: CompletionItemDefaults = optional_field()
 	"""In many cases the items of an actual completion result share the same
 	value for properties like `commitCharacters` or the range of a text
 	edit. A completion list can therefore define item defaults which will
@@ -4566,7 +4884,7 @@ class CompletionList(TypedDict, total=False):
 	capability.
 
 	@since 3.17.0"""
-	applyKind: NotRequired[CompletionItemApplyKinds]
+	applyKind: CompletionItemApplyKinds = optional_field()
 	"""Specifies how fields from a completion item should be combined with those
 	from `completionList.itemDefaults`.
 
@@ -4588,16 +4906,19 @@ class CompletionList(TypedDict, total=False):
 	"""The completion items."""
 
 
+@dataclass
 class CompletionRegistrationOptions(TextDocumentRegistrationOptions, CompletionOptions):
 	"""Registration options for a {@link CompletionRequest}."""
 
+@dataclass
 class HoverParams(TextDocumentPositionParams):
 	"""Parameters for a {@link HoverRequest}."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class MarkedStringWithLanguage(TypedDict, total=False):
+@dataclass
+class MarkedStringWithLanguage:
 	"""@since 3.18.0
 	@deprecated use MarkupContent instead."""
 	language: str
@@ -4618,19 +4939,22 @@ ${value}
 Note that markdown strings will be sanitized - that means html will be escaped.
 @deprecated use MarkupContent instead."""
 
-class Hover(TypedDict, total=False):
+@dataclass
+class Hover:
 	"""The result of a hover request."""
 	contents: Union[MarkupContent, MarkedString, List[MarkedString]]
 	"""The hover's content"""
-	range: NotRequired[Range]
+	range: Range = optional_field()
 	"""An optional range inside the text document that is used to
 	visualize the hover, e.g. by changing the background color."""
 
 
+@dataclass
 class HoverRegistrationOptions(TextDocumentRegistrationOptions, HoverOptions):
 	"""Registration options for a {@link HoverRequest}."""
 
-class ParameterInformation(TypedDict, total=False):
+@dataclass
+class ParameterInformation:
 	"""Represents a parameter of a callable-signature. A parameter can
 	have a label and a doc-comment."""
 	label: Union[str, Tuple[uinteger, uinteger]]
@@ -4646,24 +4970,25 @@ class ParameterInformation(TypedDict, total=False):
 
 	*Note*: a label of type string should be a substring of its containing signature label.
 	Its intended use case is to highlight the parameter label part in the `SignatureInformation.label`."""
-	documentation: NotRequired[Union[str, MarkupContent]]
+	documentation: Union[str, MarkupContent] = optional_field()
 	"""The human-readable doc-comment of this parameter. Will be shown
 	in the UI but can be omitted."""
 
 
-class SignatureInformation(TypedDict, total=False):
+@dataclass
+class SignatureInformation:
 	"""Represents the signature of something callable. A signature
 	can have a label, like a function-name, a doc-comment, and
 	a set of parameters."""
 	label: str
 	"""The label of this signature. Will be shown in
 	the UI."""
-	documentation: NotRequired[Union[str, MarkupContent]]
+	documentation: Union[str, MarkupContent] = optional_field()
 	"""The human-readable doc-comment of this signature. Will be shown
 	in the UI but can be omitted."""
-	parameters: NotRequired[List[ParameterInformation]]
+	parameters: List[ParameterInformation] = optional_field()
 	"""The parameters of this signature."""
-	activeParameter: NotRequired[Union[uinteger, None]]
+	activeParameter: Union[uinteger, None] = optional_field()
 	"""The index of the active parameter.
 
 	If `null`, no parameter of the signature is active (for example a named
@@ -4677,13 +5002,14 @@ class SignatureInformation(TypedDict, total=False):
 	@since 3.16.0"""
 
 
-class SignatureHelp(TypedDict, total=False):
+@dataclass
+class SignatureHelp:
 	"""Signature help represents the signature of something
 	callable. There can be multiple signature but only one
 	active and only one active parameter."""
 	signatures: List[SignatureInformation]
 	"""One or more signatures."""
-	activeSignature: NotRequired[uinteger]
+	activeSignature: uinteger = optional_field()
 	"""The active signature. If omitted or the value lies outside the
 	range of `signatures` the value defaults to zero or is ignored if
 	the `SignatureHelp` has no signatures.
@@ -4693,7 +5019,7 @@ class SignatureHelp(TypedDict, total=False):
 
 	In future version of the protocol this property might become
 	mandatory to better express this."""
-	activeParameter: NotRequired[Union[uinteger, None]]
+	activeParameter: Union[uinteger, None] = optional_field()
 	"""The active parameter of the active signature.
 
 	If `null`, no parameter of the signature is active (for example a named
@@ -4712,13 +5038,14 @@ class SignatureHelp(TypedDict, total=False):
 	the active signature does have any."""
 
 
-class SignatureHelpContext(TypedDict, total=False):
+@dataclass
+class SignatureHelpContext:
 	"""Additional information about the context in which a signature help request was triggered.
 
 	@since 3.15.0"""
 	triggerKind: SignatureHelpTriggerKind
 	"""Action that caused signature help to be triggered."""
-	triggerCharacter: NotRequired[str]
+	triggerCharacter: str = optional_field()
 	"""Character that caused signature help to be triggered.
 
 	This is undefined when `triggerKind !== SignatureHelpTriggerKind.TriggerCharacter`"""
@@ -4727,113 +5054,126 @@ class SignatureHelpContext(TypedDict, total=False):
 
 	Retriggers occurs when the signature help is already active and can be caused by actions such as
 	typing a trigger character, a cursor move, or document content changes."""
-	activeSignatureHelp: NotRequired[SignatureHelp]
+	activeSignatureHelp: SignatureHelp = optional_field()
 	"""The currently active `SignatureHelp`.
 
 	The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field updated based on
 	the user navigating through available signatures."""
 
 
+@dataclass
 class SignatureHelpParams(TextDocumentPositionParams):
 	"""Parameters for a {@link SignatureHelpRequest}."""
-	context: NotRequired[SignatureHelpContext]
+	context: SignatureHelpContext = optional_field()
 	"""The signature help context. This is only available if the client specifies
 	to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
 
 	@since 3.15.0"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
+@dataclass
 class SignatureHelpRegistrationOptions(TextDocumentRegistrationOptions, SignatureHelpOptions):
 	"""Registration options for a {@link SignatureHelpRequest}."""
 
+@dataclass
 class DefinitionParams(TextDocumentPositionParams):
 	"""Parameters for a {@link DefinitionRequest}."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
+@dataclass
 class DefinitionRegistrationOptions(TextDocumentRegistrationOptions, DefinitionOptions):
 	"""Registration options for a {@link DefinitionRequest}."""
 
-class ReferenceContext(TypedDict, total=False):
+@dataclass
+class ReferenceContext:
 	"""Value-object that contains additional information when
 	requesting references."""
 	includeDeclaration: bool
 	"""Include the declaration of the current symbol."""
 
 
+@dataclass
 class ReferenceParams(TextDocumentPositionParams):
 	"""Parameters for a {@link ReferencesRequest}."""
 	context: ReferenceContext
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
+@dataclass
 class ReferenceRegistrationOptions(TextDocumentRegistrationOptions, ReferenceOptions):
 	"""Registration options for a {@link ReferencesRequest}."""
 
+@dataclass
 class DocumentHighlightParams(TextDocumentPositionParams):
 	"""Parameters for a {@link DocumentHighlightRequest}."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class DocumentHighlight(TypedDict, total=False):
+@dataclass
+class DocumentHighlight:
 	"""A document highlight is a range inside a text document which deserves
 	special attention. Usually a document highlight is visualized by changing
 	the background color of its range."""
 	range: Range
 	"""The range this highlight applies to."""
-	kind: NotRequired[DocumentHighlightKind]
+	kind: DocumentHighlightKind = optional_field()
 	"""The highlight kind, default is {@link DocumentHighlightKind.Text text}."""
 
 
+@dataclass
 class DocumentHighlightRegistrationOptions(TextDocumentRegistrationOptions, DocumentHighlightOptions):
 	"""Registration options for a {@link DocumentHighlightRequest}."""
 
-class DocumentSymbolParams(TypedDict, total=False):
+@dataclass
+class DocumentSymbolParams:
 	"""Parameters for a {@link DocumentSymbolRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The text document."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class BaseSymbolInformation(TypedDict, total=False):
+@dataclass
+class BaseSymbolInformation:
 	"""A base for all symbol information."""
 	name: str
 	"""The name of this symbol."""
 	kind: SymbolKind
 	"""The kind of this symbol."""
-	tags: NotRequired[List[SymbolTag]]
+	tags: List[SymbolTag] = optional_field()
 	"""Tags for this symbol.
 
 	@since 3.16.0"""
-	containerName: NotRequired[str]
+	containerName: str = optional_field()
 	"""The name of the symbol containing this symbol. This information is for
 	user interface purposes (e.g. to render a qualifier in the user interface
 	if necessary). It can't be used to re-infer a hierarchy for the document
 	symbols."""
 
 
+@dataclass
 class SymbolInformation(BaseSymbolInformation):
 	"""Represents information about programming constructs like variables, classes,
 	interfaces etc."""
-	deprecated: NotRequired[bool]
+	deprecated: bool = optional_field()
 	"""Indicates if this symbol is deprecated.
 
 	@deprecated Use tags instead"""
@@ -4849,7 +5189,8 @@ class SymbolInformation(BaseSymbolInformation):
 	the symbols."""
 
 
-class DocumentSymbol(TypedDict, total=False):
+@dataclass
+class DocumentSymbol:
 	"""Represents programming constructs like variables, classes, interfaces etc.
 	that appear in a document. Document symbols can be hierarchical and they
 	have two ranges: one that encloses its definition and one that points to
@@ -4857,15 +5198,15 @@ class DocumentSymbol(TypedDict, total=False):
 	name: str
 	"""The name of this symbol. Will be displayed in the user interface and therefore must not be
 	an empty string or a string only consisting of white spaces."""
-	detail: NotRequired[str]
+	detail: str = optional_field()
 	"""More detail for this symbol, e.g the signature of a function."""
 	kind: SymbolKind
 	"""The kind of this symbol."""
-	tags: NotRequired[List[SymbolTag]]
+	tags: List[SymbolTag] = optional_field()
 	"""Tags for this document symbol.
 
 	@since 3.16.0"""
-	deprecated: NotRequired[bool]
+	deprecated: bool = optional_field()
 	"""Indicates if this symbol is deprecated.
 
 	@deprecated Use tags instead"""
@@ -4876,14 +5217,16 @@ class DocumentSymbol(TypedDict, total=False):
 	selectionRange: Range
 	"""The range that should be selected and revealed when this symbol is being picked, e.g the name of a function.
 	Must be contained by the `range`."""
-	children: NotRequired[List["DocumentSymbol"]]
+	children: List["DocumentSymbol"] = optional_field()
 	"""Children of this symbol, e.g. properties of a class."""
 
 
+@dataclass
 class DocumentSymbolRegistrationOptions(TextDocumentRegistrationOptions, DocumentSymbolOptions):
 	"""Registration options for a {@link DocumentSymbolRequest}."""
 
-class CodeActionContext(TypedDict, total=False):
+@dataclass
+class CodeActionContext:
 	"""Contains additional diagnostic information about the context in which
 	a {@link CodeActionProvider.provideCodeActions code action} is run."""
 	diagnostics: List[Diagnostic]
@@ -4892,18 +5235,19 @@ class CodeActionContext(TypedDict, total=False):
 	errors are currently presented to the user for the given range. There is no guarantee
 	that these accurately reflect the error state of the resource. The primary parameter
 	to compute code actions is the provided range."""
-	only: NotRequired[List[CodeActionKind]]
+	only: List[CodeActionKind] = optional_field()
 	"""Requested kind of actions to return.
 
 	Actions not of this kind are filtered out by the client before being shown. So servers
 	can omit computing them."""
-	triggerKind: NotRequired[CodeActionTriggerKind]
+	triggerKind: CodeActionTriggerKind = optional_field()
 	"""The reason why code actions were requested.
 
 	@since 3.17.0"""
 
 
-class CodeActionParams(TypedDict, total=False):
+@dataclass
+class CodeActionParams:
 	"""The parameters of a {@link CodeActionRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document in which the command was invoked."""
@@ -4911,14 +5255,15 @@ class CodeActionParams(TypedDict, total=False):
 	"""The range for which the command was invoked."""
 	context: CodeActionContext
 	"""Context carrying additional information."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CodeActionDisabled(TypedDict, total=False):
+@dataclass
+class CodeActionDisabled:
 	"""Captures why the code action is currently disabled.
 
 	@since 3.18.0"""
@@ -4928,20 +5273,21 @@ class CodeActionDisabled(TypedDict, total=False):
 	This is displayed in the code actions UI."""
 
 
-class CodeAction(TypedDict, total=False):
+@dataclass
+class CodeAction:
 	"""A code action represents a change that can be performed in code, e.g. to fix a problem or
 	to refactor code.
 
 	A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed."""
 	title: str
 	"""A short, human-readable, title for this code action."""
-	kind: NotRequired[CodeActionKind]
+	kind: CodeActionKind = optional_field()
 	"""The kind of the code action.
 
 	Used to filter code actions."""
-	diagnostics: NotRequired[List[Diagnostic]]
+	diagnostics: List[Diagnostic] = optional_field()
 	"""The diagnostics that this code action resolves."""
-	isPreferred: NotRequired[bool]
+	isPreferred: bool = optional_field()
 	"""Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
 	by keybindings.
 
@@ -4949,7 +5295,7 @@ class CodeAction(TypedDict, total=False):
 	A refactoring should be marked preferred if it is the most reasonable choice of actions to take.
 
 	@since 3.15.0"""
-	disabled: NotRequired[CodeActionDisabled]
+	disabled: CodeActionDisabled = optional_field()
 	"""Marks that the code action cannot currently be applied.
 
 	Clients should follow the following guidelines regarding disabled code actions:
@@ -4965,27 +5311,29 @@ class CodeAction(TypedDict, total=False):
 	    error message with `reason` in the editor.
 
 	@since 3.16.0"""
-	edit: NotRequired[WorkspaceEdit]
+	edit: WorkspaceEdit = optional_field()
 	"""The workspace edit this code action performs."""
-	command: NotRequired[Command]
+	command: Command = optional_field()
 	"""A command this code action executes. If a code action
 	provides an edit and a command, first the edit is
 	executed and then the command."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on a code action between
 	a `textDocument/codeAction` and a `codeAction/resolve` request.
 
 	@since 3.16.0"""
-	tags: NotRequired[List[CodeActionTag]]
+	tags: List[CodeActionTag] = optional_field()
 	"""Tags for this code action.
 
 	@since 3.18.0 - proposed"""
 
 
+@dataclass
 class CodeActionRegistrationOptions(TextDocumentRegistrationOptions, CodeActionOptions):
 	"""Registration options for a {@link CodeActionRequest}."""
 
-class WorkspaceSymbolParams(TypedDict, total=False):
+@dataclass
+class WorkspaceSymbolParams:
 	"""The parameters of a {@link WorkspaceSymbolRequest}."""
 	query: str
 	"""A query string to filter symbols by. Clients may send an empty
@@ -4996,20 +5344,22 @@ class WorkspaceSymbolParams(TypedDict, total=False):
 	of thumb is to match case-insensitive and to simply check that the
 	characters of *query* appear in their order in a candidate symbol.
 	Servers shouldn't use prefix, substring, or similar strict matching."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class LocationUriOnly(TypedDict, total=False):
+@dataclass
+class LocationUriOnly:
 	"""Location with only uri and does not include range.
 
 	@since 3.18.0"""
 	uri: DocumentUri
 
 
+@dataclass
 class WorkspaceSymbol(BaseSymbolInformation):
 	"""A special workspace symbol that supports locations without a range.
 
@@ -5022,26 +5372,29 @@ class WorkspaceSymbol(BaseSymbolInformation):
 	capability `workspace.symbol.resolveSupport`.
 
 	See SymbolInformation#location for more details."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on a workspace symbol between a
 	workspace symbol request and a workspace symbol resolve request."""
 
 
+@dataclass
 class WorkspaceSymbolRegistrationOptions(WorkspaceSymbolOptions):
 	"""Registration options for a {@link WorkspaceSymbolRequest}."""
 
-class CodeLensParams(TypedDict, total=False):
+@dataclass
+class CodeLensParams:
 	"""The parameters of a {@link CodeLensRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to request code lens for."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class CodeLens(TypedDict, total=False):
+@dataclass
+class CodeLens:
 	"""A code lens represents a {@link Command command} that should be shown along with
 	source text, like the number of references, a way to run tests, etc.
 
@@ -5049,35 +5402,38 @@ class CodeLens(TypedDict, total=False):
 	reasons the creation of a code lens and resolving should be done in two stages."""
 	range: Range
 	"""The range in which this code lens is valid. Should only span a single line."""
-	command: NotRequired[Command]
+	command: Command = optional_field()
 	"""The command this code lens represents."""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on a code lens item between
 	a {@link CodeLensRequest} and a {@link CodeLensResolveRequest}"""
 
 
+@dataclass
 class CodeLensRegistrationOptions(TextDocumentRegistrationOptions, CodeLensOptions):
 	"""Registration options for a {@link CodeLensRequest}."""
 
-class DocumentLinkParams(TypedDict, total=False):
+@dataclass
+class DocumentLinkParams:
 	"""The parameters of a {@link DocumentLinkRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to provide document links for."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
-	partialResultToken: NotRequired[ProgressToken]
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class DocumentLink(TypedDict, total=False):
+@dataclass
+class DocumentLink:
 	"""A document link is a range in a text document that links to an internal or external resource, like another
 	text document or a web site."""
 	range: Range
 	"""The range this link applies to."""
-	target: NotRequired[URI]
+	target: URI = optional_field()
 	"""The uri this link points to. If missing a resolve request is sent later."""
-	tooltip: NotRequired[str]
+	tooltip: str = optional_field()
 	"""The tooltip text when you hover over this link.
 
 	If a tooltip is provided, is will be displayed in a string that includes instructions on how to
@@ -5085,48 +5441,53 @@ class DocumentLink(TypedDict, total=False):
 	user settings, and localization.
 
 	@since 3.15.0"""
-	data: NotRequired[LSPAny]
+	data: LSPAny = optional_field()
 	"""A data entry field that is preserved on a document link between a
 	DocumentLinkRequest and a DocumentLinkResolveRequest."""
 
 
+@dataclass
 class DocumentLinkRegistrationOptions(TextDocumentRegistrationOptions, DocumentLinkOptions):
 	"""Registration options for a {@link DocumentLinkRequest}."""
 
-class FormattingOptions(TypedDict, total=False):
+@dataclass
+class FormattingOptions:
 	"""Value-object describing what options formatting should use."""
 	tabSize: uinteger
 	"""Size of a tab in spaces."""
 	insertSpaces: bool
 	"""Prefer spaces over tabs."""
-	trimTrailingWhitespace: NotRequired[bool]
+	trimTrailingWhitespace: bool = optional_field()
 	"""Trim trailing whitespace on a line.
 
 	@since 3.15.0"""
-	insertFinalNewline: NotRequired[bool]
+	insertFinalNewline: bool = optional_field()
 	"""Insert a newline character at the end of the file if one does not exist.
 
 	@since 3.15.0"""
-	trimFinalNewlines: NotRequired[bool]
+	trimFinalNewlines: bool = optional_field()
 	"""Trim all newlines after the final newline at the end of the file.
 
 	@since 3.15.0"""
 
 
-class DocumentFormattingParams(TypedDict, total=False):
+@dataclass
+class DocumentFormattingParams:
 	"""The parameters of a {@link DocumentFormattingRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to format."""
 	options: FormattingOptions
 	"""The format options."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
+@dataclass
 class DocumentFormattingRegistrationOptions(TextDocumentRegistrationOptions, DocumentFormattingOptions):
 	"""Registration options for a {@link DocumentFormattingRequest}."""
 
-class DocumentRangeFormattingParams(TypedDict, total=False):
+@dataclass
+class DocumentRangeFormattingParams:
 	"""The parameters of a {@link DocumentRangeFormattingRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to format."""
@@ -5134,14 +5495,16 @@ class DocumentRangeFormattingParams(TypedDict, total=False):
 	"""The range to format"""
 	options: FormattingOptions
 	"""The format options"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
+@dataclass
 class DocumentRangeFormattingRegistrationOptions(TextDocumentRegistrationOptions, DocumentRangeFormattingOptions):
 	"""Registration options for a {@link DocumentRangeFormattingRequest}."""
 
-class DocumentRangesFormattingParams(TypedDict, total=False):
+@dataclass
+class DocumentRangesFormattingParams:
 	"""The parameters of a {@link DocumentRangesFormattingRequest}.
 
 	@since 3.18.0
@@ -5152,11 +5515,12 @@ class DocumentRangesFormattingParams(TypedDict, total=False):
 	"""The ranges to format"""
 	options: FormattingOptions
 	"""The format options"""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class DocumentOnTypeFormattingParams(TypedDict, total=False):
+@dataclass
+class DocumentOnTypeFormattingParams:
 	"""The parameters of a {@link DocumentOnTypeFormattingRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to format."""
@@ -5173,10 +5537,12 @@ class DocumentOnTypeFormattingParams(TypedDict, total=False):
 	"""The formatting options."""
 
 
+@dataclass
 class DocumentOnTypeFormattingRegistrationOptions(TextDocumentRegistrationOptions, DocumentOnTypeFormattingOptions):
 	"""Registration options for a {@link DocumentOnTypeFormattingRequest}."""
 
-class RenameParams(TypedDict, total=False):
+@dataclass
+class RenameParams:
 	"""The parameters of a {@link RenameRequest}."""
 	textDocument: TextDocumentIdentifier
 	"""The document to rename."""
@@ -5186,89 +5552,97 @@ class RenameParams(TypedDict, total=False):
 	"""The new name of the symbol. If the given name is not valid the
 	request must return a {@link ResponseError} with an
 	appropriate message set."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
+@dataclass
 class RenameRegistrationOptions(TextDocumentRegistrationOptions, RenameOptions):
 	"""Registration options for a {@link RenameRequest}."""
 
+@dataclass
 class PrepareRenameParams(TextDocumentPositionParams):
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class ExecuteCommandParams(TypedDict, total=False):
+@dataclass
+class ExecuteCommandParams:
 	"""The parameters of a {@link ExecuteCommandRequest}."""
 	command: str
 	"""The identifier of the actual command handler."""
-	arguments: NotRequired[List[LSPAny]]
+	arguments: List[LSPAny] = optional_field()
 	"""Arguments that the command should be invoked with."""
-	workDoneToken: NotRequired[ProgressToken]
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
+@dataclass
 class ExecuteCommandRegistrationOptions(ExecuteCommandOptions):
 	"""Registration options for a {@link ExecuteCommandRequest}."""
 
-class WorkspaceEditMetadata(TypedDict, total=False):
+@dataclass
+class WorkspaceEditMetadata:
 	"""Additional data about a workspace edit.
 
 	@since 3.18.0
 	@proposed"""
-	isRefactoring: NotRequired[bool]
+	isRefactoring: bool = optional_field()
 	"""Signal to the editor that this edit is a refactoring."""
 
 
-class ApplyWorkspaceEditParams(TypedDict, total=False):
+@dataclass
+class ApplyWorkspaceEditParams:
 	"""The parameters passed via an apply workspace edit request."""
-	label: NotRequired[str]
+	label: str = optional_field()
 	"""An optional label of the workspace edit. This label is
 	presented in the user interface for example on an undo
 	stack to undo the workspace edit."""
 	edit: WorkspaceEdit
 	"""The edits to apply."""
-	metadata: NotRequired[WorkspaceEditMetadata]
+	metadata: WorkspaceEditMetadata = optional_field()
 	"""Additional data about the edit.
 
 	@since 3.18.0
 	@proposed"""
 
 
-class ApplyWorkspaceEditResult(TypedDict, total=False):
+@dataclass
+class ApplyWorkspaceEditResult:
 	"""The result returned from the apply workspace edit request.
 
 	@since 3.17 renamed from ApplyWorkspaceEditResponse"""
 	applied: bool
 	"""Indicates whether the edit was applied or not."""
-	failureReason: NotRequired[str]
+	failureReason: str = optional_field()
 	"""An optional textual description for why the edit was not applied.
 	This may be used by the server for diagnostic logging or to provide
 	a suitable error for a request that triggered the edit."""
-	failedChange: NotRequired[uinteger]
+	failedChange: uinteger = optional_field()
 	"""Depending on the client's failure handling strategy `failedChange` might
 	contain the index of the change that failed. This property is only available
 	if the client signals a `failureHandlingStrategy` in its client capabilities."""
 
 
-class WorkDoneProgressBegin(TypedDict, total=False):
+@dataclass
+class WorkDoneProgressBegin:
 	kind: Literal['begin']
 	title: str
 	"""Mandatory title of the progress operation. Used to briefly inform about
 	the kind of operation being performed.
 
 	Examples: "Indexing" or "Linking dependencies"."""
-	cancellable: NotRequired[bool]
+	cancellable: bool = optional_field()
 	"""Controls if a cancel button should show to allow the user to cancel the
 	long running operation. Clients that don't support cancellation are allowed
 	to ignore the setting."""
-	message: NotRequired[str]
+	message: str = optional_field()
 	"""Optional, more detailed associated progress message. Contains
 	complementary information to the `title`.
 
 	Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
 	If unset, the previous progress message (if any) is still valid."""
-	percentage: NotRequired[uinteger]
+	percentage: uinteger = optional_field()
 	"""Optional progress percentage to display (value 100 is considered 100%).
 	If not provided infinite progress is assumed and clients are allowed
 	to ignore the `percentage` value in subsequent in report notifications.
@@ -5277,20 +5651,21 @@ class WorkDoneProgressBegin(TypedDict, total=False):
 	that are not following this rule. The value range is [0, 100]."""
 
 
-class WorkDoneProgressReport(TypedDict, total=False):
+@dataclass
+class WorkDoneProgressReport:
 	kind: Literal['report']
-	cancellable: NotRequired[bool]
+	cancellable: bool = optional_field()
 	"""Controls enablement state of a cancel button.
 
 	Clients that don't support cancellation or don't support controlling the button's
 	enablement state are allowed to ignore the property."""
-	message: NotRequired[str]
+	message: str = optional_field()
 	"""Optional, more detailed associated progress message. Contains
 	complementary information to the `title`.
 
 	Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
 	If unset, the previous progress message (if any) is still valid."""
-	percentage: NotRequired[uinteger]
+	percentage: uinteger = optional_field()
 	"""Optional progress percentage to display (value 100 is considered 100%).
 	If not provided infinite progress is assumed and clients are allowed
 	to ignore the `percentage` value in subsequent in report notifications.
@@ -5299,49 +5674,57 @@ class WorkDoneProgressReport(TypedDict, total=False):
 	that are not following this rule. The value range is [0, 100]"""
 
 
-class WorkDoneProgressEnd(TypedDict, total=False):
+@dataclass
+class WorkDoneProgressEnd:
 	kind: Literal['end']
-	message: NotRequired[str]
+	message: str = optional_field()
 	"""Optional, a final message indicating to for example indicate the outcome
 	of the operation."""
 
 
-class SetTraceParams(TypedDict, total=False):
+@dataclass
+class SetTraceParams:
 	value: TraceValue
 
 
-class LogTraceParams(TypedDict, total=False):
+@dataclass
+class LogTraceParams:
 	message: str
-	verbose: NotRequired[str]
+	verbose: str = optional_field()
 
 
-class CancelParams(TypedDict, total=False):
+@dataclass
+class CancelParams:
 	id: Union[int, str]
 	"""The request id to cancel."""
 
 
-class ProgressParams(TypedDict, total=False):
+@dataclass
+class ProgressParams:
 	token: ProgressToken
 	"""The progress token provided by the client or server."""
 	value: LSPAny
 	"""The progress data."""
 
 
-class WorkDoneProgressParams(TypedDict, total=False):
-	workDoneToken: NotRequired[ProgressToken]
+@dataclass
+class WorkDoneProgressParams:
+	workDoneToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report work done progress."""
 
 
-class PartialResultParams(TypedDict, total=False):
-	partialResultToken: NotRequired[ProgressToken]
+@dataclass
+class PartialResultParams:
+	partialResultToken: ProgressToken = optional_field()
 	"""An optional token that a server can use to report partial results (e.g. streaming) to
 	the client."""
 
 
-class LocationLink(TypedDict, total=False):
+@dataclass
+class LocationLink:
 	"""Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
 	including an origin range."""
-	originSelectionRange: NotRequired[Range]
+	originSelectionRange: Range = optional_field()
 	"""Span of the origin of this link.
 
 	Used as the underlined span for mouse interaction. Defaults to the word range at
@@ -5357,15 +5740,17 @@ class LocationLink(TypedDict, total=False):
 	Must be contained by the `targetRange`. See also `DocumentSymbol#range`"""
 
 
-class StaticRegistrationOptions(TypedDict, total=False):
+@dataclass
+class StaticRegistrationOptions:
 	"""Static registration options to be returned in the initialize
 	request."""
-	id: NotRequired[str]
+	id: str = optional_field()
 	"""The id used to register the request. The id can be used to deregister
 	the request again. See also Registration#id."""
 
 
-class InlineValueText(TypedDict, total=False):
+@dataclass
+class InlineValueText:
 	"""Provide inline value as text.
 
 	@since 3.17.0"""
@@ -5375,7 +5760,8 @@ class InlineValueText(TypedDict, total=False):
 	"""The text of the inline value."""
 
 
-class InlineValueVariableLookup(TypedDict, total=False):
+@dataclass
+class InlineValueVariableLookup:
 	"""Provide inline value through a variable lookup.
 	If only a range is specified, the variable name will be extracted from the underlying document.
 	An optional variable name can be used to override the extracted name.
@@ -5384,13 +5770,14 @@ class InlineValueVariableLookup(TypedDict, total=False):
 	range: Range
 	"""The document range for which the inline value applies.
 	The range is used to extract the variable name from the underlying document."""
-	variableName: NotRequired[str]
+	variableName: str = optional_field()
 	"""If specified the name of the variable to look up."""
 	caseSensitiveLookup: bool
 	"""How to perform the lookup."""
 
 
-class InlineValueEvaluatableExpression(TypedDict, total=False):
+@dataclass
+class InlineValueEvaluatableExpression:
 	"""Provide an inline value through an expression evaluation.
 	If only a range is specified, the expression will be extracted from the underlying document.
 	An optional expression can be used to override the extracted expression.
@@ -5399,15 +5786,16 @@ class InlineValueEvaluatableExpression(TypedDict, total=False):
 	range: Range
 	"""The document range for which the inline value applies.
 	The range is used to extract the evaluatable expression from the underlying document."""
-	expression: NotRequired[str]
+	expression: str = optional_field()
 	"""If specified the expression overrides the extracted expression."""
 
 
+@dataclass
 class RelatedFullDocumentDiagnosticReport(FullDocumentDiagnosticReport):
 	"""A full diagnostic report with a set of related documents.
 
 	@since 3.17.0"""
-	relatedDocuments: NotRequired[Dict[DocumentUri, Union[FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport]]]
+	relatedDocuments: Dict[DocumentUri, Union[FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport]] = optional_field()
 	"""Diagnostics of related documents. This information is useful
 	in programming languages where code in a file A can generate
 	diagnostics in a file B which A depends on. An example of
@@ -5417,11 +5805,12 @@ class RelatedFullDocumentDiagnosticReport(FullDocumentDiagnosticReport):
 	@since 3.17.0"""
 
 
+@dataclass
 class RelatedUnchangedDocumentDiagnosticReport(UnchangedDocumentDiagnosticReport):
 	"""An unchanged diagnostic report with a set of related documents.
 
 	@since 3.17.0"""
-	relatedDocuments: NotRequired[Dict[DocumentUri, Union[FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport]]]
+	relatedDocuments: Dict[DocumentUri, Union[FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport]] = optional_field()
 	"""Diagnostics of related documents. This information is useful
 	in programming languages where code in a file A can generate
 	diagnostics in a file B which A depends on. An example of
@@ -5431,13 +5820,15 @@ class RelatedUnchangedDocumentDiagnosticReport(UnchangedDocumentDiagnosticReport
 	@since 3.17.0"""
 
 
-class PrepareRenamePlaceholder(TypedDict, total=False):
+@dataclass
+class PrepareRenamePlaceholder:
 	"""@since 3.18.0"""
 	range: Range
 	placeholder: str
 
 
-class PrepareRenameDefaultBehavior(TypedDict, total=False):
+@dataclass
+class PrepareRenameDefaultBehavior:
 	"""@since 3.18.0"""
 	defaultBehavior: bool
 

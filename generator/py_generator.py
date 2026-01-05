@@ -254,7 +254,9 @@ class CodeGenerator:
 
         imports = [
             FromImports("__future__", ["annotations"]),
+            FromImports("dataclasses", ["dataclass", "field"]),
             FromImports("enum", ["Enum"]),
+            FromImports("functools", ["partial"]),
             FromImports(
                 "typing",
                 [
@@ -264,13 +266,14 @@ class CodeGenerator:
                     "Tuple",
                     "Literal",
                     "TypeAlias",
-                    "TypedDict",
-                    "NotRequired",
                 ],
             ),
         ]
 
         base_aliases = [
+            Variable(
+                "optional_field", value='partial(field, metadata={"optional": True})'
+            ),
             Variable("uinteger", "TypeAlias", "int"),
             Variable("URI", "TypeAlias", "str"),
             Variable("DocumentUri", "TypeAlias", "str"),
@@ -578,9 +581,10 @@ class CodeGenerator:
 
     def property(self, tp: Property) -> Variable:
         type_ = self.type_(tp.type)
+        value = None
         if tp.optional:
-            type_ = f"NotRequired[{type_}]"
-        return Variable(tp.name, type_, docstring=tp.documentation)
+            value = "optional_field()"
+        return Variable(tp.name, type_, value, docstring=tp.documentation)
 
     def pull_reference(self, tp: ReferenceType) -> Structure:
         return self._structure_maps[tp.name]
@@ -589,8 +593,6 @@ class CodeGenerator:
         parents = []
         if tp.extends:
             parents += [self.type_(p) for p in tp.extends]
-        else:
-            parents += ["TypedDict", "total=False"]
 
         properties = tp.properties or list()
         if tp.mixins:
@@ -602,6 +604,7 @@ class CodeGenerator:
         return Class(
             tp.name,
             parents=parents,
+            decorators=["@dataclass"],
             variables=variables,
             docstring=tp.documentation,
         )
