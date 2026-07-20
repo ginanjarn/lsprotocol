@@ -1,6 +1,5 @@
-from dataclasses import dataclass, is_dataclass
+from dataclasses import is_dataclass
 from enum import Enum
-from functools import wraps
 from typing import (
     TypedDict,
     Union,
@@ -11,14 +10,12 @@ from typing import (
     get_args,
     get_type_hints,
     is_typeddict,
-    Callable,
-    Any,
 )
 
 
 def get_default_value(
     typ: type, *, only_required: bool = False, recursive: bool = False
-) -> dict:
+) -> object:
     """Get 'type' default value
 
     * only_required: ignore field annotated with NotRequired
@@ -26,43 +23,21 @@ def get_default_value(
       if False(default) return 'MissingValue' object
 
     """
-    return TypeValue(typ, only_required, recursive).get_default()
+    return TypeDefaultGenerator(typ, only_required, recursive).get_default_value()
 
 
-class TypeValue:
+class TypeDefaultGenerator:
     """TypeValue default value generator"""
 
-    def __init__(self, typ: type, only_required: bool = False, recursive: bool = False):
+    def __init__(self, typ: type, only_required: bool = False):
         self.typ = typ
         self.only_required = only_required
-        self.recursive = recursive
 
-        self._enter_recursion = False
-
-    def check_recursion(func: Callable[[...], Any]) -> Any:
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if self._enter_recursion and not self.recursive:
-                try:
-                    typ = args[0]
-                except IndexError:
-                    typ = kwargs["typ"]
-                return RequiredValue(typ)
-
-            self._enter_recursion = True
-            ret = func(self, *args, **kwargs)
-            self._enter_recursion = False
-            return ret
-
-        return wrapper
-
-    def get_default(self) -> dict:
+    def get_default_value(self) -> object:
         """get default value"""
-        return self._get_type_default(self.typ)
+        return self._get_default_value(self.typ)
 
-    @check_recursion
-    def _get_typeddict_default(self, typ: TypedDict):
-        data = {}
+    def _get_typeddict(self, typ: TypedDict):
         type_hints = get_type_hints(typ)
 
         if self.only_required:
@@ -70,21 +45,28 @@ class TypeValue:
         else:
             keys = type_hints.keys()
 
+        items = {}
         for key in keys:
-            type_ = type_hints[key]
-            if key == "valueSet":
-                data[key] = self._get_valueset_default(type_)
-            else:
-                data[key] = self._get_type_default(type_)
+            items[key] = (
+                self._get_value_set(type_hints[key])
+                if key == "valueSet"
+                else self._get_default_value(type_hints[key])
+            )
 
-        return data
+        return typ(items)
 
-    @check_recursion
-    def _get_dataclass_default(self, typ: type) -> object:
-        kwargs = {k: self._get_type_default(v) for k, v in get_type_hints(typ).items()}
+    def _get_dataclass(self, typ: type) -> object:
+        type_hints = get_type_hints(typ)
+        kwargs = {}
+        for key in type_hints.keys():
+            kwargs[key] = (
+                self._get_value_set(type_hints[key])
+                if key == "valueSet"
+                else self._get_default_value(type_hints[key])
+            )
         return typ(**kwargs)
 
-    def _get_valueset_default(self, typ: List[Enum]) -> List[object]:
+    def _get_value_set(self, typ: List[Enum]) -> List[object]:
         origin = get_origin(typ)
         args = get_args(typ)
         items = args[0]
@@ -92,46 +74,39 @@ class TypeValue:
             raise ValueError("'valueSet' only accept list of Enum")
         return [i.value for i in items]
 
-    def _get_type_default(self, typ: type) -> object:
-        atomic_types = {
-            int: 0,
-            float: 0.0,
-            str: "",
-            bool: False,
-            None: None,  # e.g.: Union[str,None]
-            type(None): None,  # e.g.: Optional[str]
+    def _get_default_value(self, typ: type) -> object:
+        atomic_types = {int, float, str, bool}
+        if typ in atomic_types:
+            return typ()
+
+        none_types = {
+            None,  # e.g.: Union[str, None]
+            type(None),  # e.g.: Optional[str]
         }
-        val = atomic_types.get(typ)
-        if val is not None:
-            return val
+        if typ in none_types:
+            return None
 
         origin = get_origin(typ)
         args = get_args(typ)
 
-        if origin == list:
-            return list()
-
-        if origin == dict:
-            return dict()
+        if origin in {list, dict}:
+            return origin()
 
         if origin == Union:
-            return self._get_type_default(args[0])
+            # return first type
+            return self._get_default_value(args[0])
 
         if origin in {Literal, LiteralString}:
             return args[0]
 
         if issubclass(typ, Enum):
-            return list(typ)[0].value
+            # return first enum
+            return list(typ)[0]
 
         if is_typeddict(typ):
-            return self._get_typeddict_default(typ)
+            return self._get_typeddict(typ)
 
         if is_dataclass(typ):
-            return self._get_dataclass_default(typ)
+            return self._get_dataclass(typ)
 
         raise ValueError(f"unable get default value for {typ}")
-
-
-@dataclass
-class RequiredValue:
-    type_: type
