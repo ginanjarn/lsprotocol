@@ -1,7 +1,5 @@
-from collections import ChainMap
-from dataclasses import dataclass, is_dataclass, fields, Field
+from dataclasses import is_dataclass, fields, Field
 from enum import Enum
-from functools import wraps
 from keyword import iskeyword, issoftkeyword
 from typing import (
     TypedDict,
@@ -13,7 +11,6 @@ from typing import (
     get_args,
     get_type_hints,
     is_typeddict,
-    Callable,
     Any,
 )
 from types import NoneType
@@ -21,7 +18,7 @@ from types import NoneType
 
 def get_default_value(
     typ: type, *, only_required: bool = False, recursive: bool = False
-) -> dict:
+) -> object:
     """Get 'type' default value
 
     * only_required: ignore field annotated with NotRequired
@@ -29,43 +26,21 @@ def get_default_value(
       if False(default) return 'MissingValue' object
 
     """
-    return TypeValue(typ, only_required, recursive).get_default()
+    return TypeDefaultGenerator(typ, only_required, recursive).get_default_value()
 
 
-class TypeValue:
+class TypeDefaultGenerator:
     """TypeValue default value generator"""
 
-    def __init__(self, typ: type, only_required: bool = False, recursive: bool = False):
+    def __init__(self, typ: type, only_required: bool = False):
         self.typ = typ
         self.only_required = only_required
-        self.recursive = recursive
 
-        self._enter_recursion = False
-
-    def check_recursion(func: Callable[[...], Any]) -> Any:
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if self._enter_recursion and not self.recursive:
-                try:
-                    typ = args[0]
-                except IndexError:
-                    typ = kwargs["typ"]
-                return RequiredValue(typ)
-
-            self._enter_recursion = True
-            ret = func(self, *args, **kwargs)
-            self._enter_recursion = False
-            return ret
-
-        return wrapper
-
-    def get_default(self) -> dict:
+    def get_default_value(self) -> object:
         """get default value"""
-        return self._get_type_default(self.typ)
+        return self._get_default_value(self.typ)
 
-    @check_recursion
-    def _get_typeddict_default(self, typ: TypedDict):
-        data = {}
+    def _get_typeddict(self, typ: TypedDict):
         type_hints = get_type_hints(typ)
 
         if self.only_required:
@@ -73,21 +48,28 @@ class TypeValue:
         else:
             keys = type_hints.keys()
 
+        items = {}
         for key in keys:
-            type_ = type_hints[key]
-            if key == "valueSet":
-                data[key] = self._get_valueset_default(type_)
-            else:
-                data[key] = self._get_type_default(type_)
+            items[key] = (
+                self._get_value_set(type_hints[key])
+                if key == "valueSet"
+                else self._get_default_value(type_hints[key])
+            )
 
-        return data
+        return typ(items)
 
-    @check_recursion
-    def _get_dataclass_default(self, typ: type) -> object:
-        kwargs = {k: self._get_type_default(v) for k, v in get_type_hints(typ).items()}
+    def _get_dataclass(self, typ: type) -> object:
+        type_hints = get_type_hints(typ)
+        kwargs = {}
+        for key in type_hints.keys():
+            kwargs[key] = (
+                self._get_value_set(type_hints[key])
+                if key == "valueSet"
+                else self._get_default_value(type_hints[key])
+            )
         return typ(**kwargs)
 
-    def _get_valueset_default(self, typ: List[Enum]) -> List[object]:
+    def _get_value_set(self, typ: List[Enum]) -> List[object]:
         origin = get_origin(typ)
         args = get_args(typ)
         items = args[0]
@@ -95,59 +77,51 @@ class TypeValue:
             raise ValueError("'valueSet' only accept list of Enum")
         return [i.value for i in items]
 
-    def _get_type_default(self, typ: type) -> object:
-        atomic_types = {
-            int: 0,
-            float: 0.0,
-            str: "",
-            bool: False,
-            None: None,  # e.g.: Union[str,None]
-            type(None): None,  # e.g.: Optional[str]
+    def _get_default_value(self, typ: type) -> object:
+        atomic_types = {int, float, str, bool}
+        if typ in atomic_types:
+            return typ()
+
+        none_types = {
+            None,  # e.g.: Union[str, None]
+            type(None),  # e.g.: Optional[str]
         }
-        val = atomic_types.get(typ)
-        if val is not None:
-            return val
+        if typ in none_types:
+            return None
 
         origin = get_origin(typ)
         args = get_args(typ)
 
-        if origin == list:
-            return list()
-
-        if origin == dict:
-            return dict()
+        if origin in {list, dict}:
+            return origin()
 
         if origin == Union:
-            return self._get_type_default(args[0])
+            # return first type
+            return self._get_default_value(args[0])
 
         if origin in {Literal, LiteralString}:
             return args[0]
 
         if issubclass(typ, Enum):
-            return list(typ)[0].value
+            # return first enum
+            return list(typ)[0]
 
         if is_typeddict(typ):
-            return self._get_typeddict_default(typ)
+            return self._get_typeddict(typ)
 
         if is_dataclass(typ):
-            return self._get_dataclass_default(typ)
+            return self._get_dataclass(typ)
 
         raise ValueError(f"unable get default value for {typ}")
 
 
-@dataclass
-class RequiredValue:
-    type_: type
-
-
+# _ATOMIC_TYPE use tuple because isinstance() argument accept tuple
 _ATOMIC_TYPE = (int, float, str, bool, NoneType)
+_OPTIONAL_KEY = "optional"
 
 
 def _is_keyword(name: str) -> bool:
     return iskeyword(name) or issoftkeyword(name)
-
-
-_OPTIONAL_KEY = "optional"
 
 
 def _is_optional_field(f: Field) -> bool:
@@ -167,6 +141,9 @@ class ToDictConverter:
         return self._convert_object(self.obj)
 
     def _convert_object(self, obj: object) -> object:
+        if isinstance(obj, Enum):
+            return obj.value
+
         if isinstance(obj, _ATOMIC_TYPE):
             return obj
 
@@ -176,34 +153,28 @@ class ToDictConverter:
         if isinstance(obj, dict):
             return {k: self._convert_object(v) for k, v in obj.items()}
 
-        if isinstance(obj, Enum):
-            return obj.value
-
         if is_dataclass(obj):
             return self._convert_dataclass(obj)
 
         raise ValueError(f"unable convert {obj}")
 
-    def _field_to_data(self, obj: object, field: Field) -> dict:
+    def _convert_field(self, parent: object, field: Field) -> tuple:
         name = field.name
-        value = getattr(obj, name)
+        value = getattr(parent, name)
         if value is None:
             # omitted field
             if _is_optional_field(field):
                 return None
 
-        if is_dataclass(field.type):
-            value = self._convert_dataclass(value)
-
-        if _is_keyword(name):
+        if _is_keyword(name[:-1]):
             # remove tail underscore, e.g: 'from_' -> 'from'
             name = name[:-1]
 
-        return {name: value}
+        value = self._convert_object(value)
+        return name, value
 
     def _convert_dataclass(self, obj: object) -> dict:
-        data = [self._field_to_data(obj, f) for f in fields(obj)]
-        return dict(ChainMap(*[d for d in data if d is not None]))
+        return dict([self._convert_field(obj, f) for f in fields(obj)])
 
 
 def from_dict(dct: dict, typ: type) -> object:
@@ -220,9 +191,6 @@ class FromDictConverter:
         return self._convert_object(self.dct, self.typ)
 
     def _convert_object(self, obj: Any, typ: type) -> object:
-        if isinstance(obj, _ATOMIC_TYPE):
-            return obj
-
         origin = get_origin(typ)
         args = get_args(typ)
 
@@ -232,7 +200,11 @@ class FromDictConverter:
         if origin is dict:
             return {k: self._convert_object(v, args[1]) for k, v in obj.items()}
 
+        if origin in {Literal, LiteralString}:
+            return obj
+
         if origin is Union:
+            # try to convert from all possible type
             for arg in args:
                 try:
                     return self._convert_object(obj, arg)
@@ -240,44 +212,39 @@ class FromDictConverter:
                     continue
             raise ValueError(f"unable convert {obj}")
 
-        if origin in {Literal, LiteralString}:
+        if is_dataclass(typ):
+            return self._convert_dataclass(obj, typ)
+
+        if is_typeddict(typ):
             return obj
 
         if issubclass(typ, Enum):
             return typ(obj)
 
-        if is_typeddict(typ):
+        # Check atomic type after check enum because int defined in enum
+        # is valid to isinstance of int
+        if isinstance(obj, _ATOMIC_TYPE):
             return obj
-
-        if is_dataclass(typ):
-            return self._convert_dataclass(obj, typ)
 
         raise ValueError(f"unable convert {obj}")
 
-    def _field_to_kwarg(self, dct: dict, field: Field, type_hints: dict) -> dict:
+    def _convert_field(self, dct: dict, field: Field, typ: type) -> dict:
         name = field.name
-        typ = type_hints[name]
         value = dct.get(name, None)
-
         if value is None:
             # validate optional
             if not _is_optional_field(field):
-                raise ValueError(f"{field.name} must assigned")
+                raise ValueError(f"{name} must assigned")
 
-        else:
-            # check dataclass if value is not None
-            if is_dataclass(typ):
-                value = self._convert_object(value, typ)
-
-        if _is_keyword(name):
-            # convert to valid identifier name, e.g.: 'from' -> 'from_'
-            name = f"{name}_"
-
-        return {name: value}
+        value = self._convert_object(value, typ)
+        return value
 
     def _convert_dataclass(self, dct: dict, typ: type) -> object:
+        # Field.type sometimes return str instead the actual type
         type_hints = get_type_hints(typ)
-        kwargs = ChainMap(
-            *[self._field_to_kwarg(dct, f, type_hints) for f in fields(typ)]
+        return typ(
+            *[
+                self._convert_field(dct, field, type_hints[field.name])
+                for field in fields(typ)
+            ]
         )
-        return typ(**kwargs)
